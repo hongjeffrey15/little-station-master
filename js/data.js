@@ -1,16 +1,31 @@
-/* 小站長 Little Station Master — curriculum data
+/* 小站長 Little Station Master — curriculum data (content pack v2)
  *
  * Everything the game teaches lives here, so parents/teachers can tune
  * content without touching the engine. Three "MTR lines":
- *   m — 數字線 Number Line   (maths, Numberblocks-style progression)
- *   c — 香港中文線 Chinese Line (Trad. Chinese via HK places + daily life)
+ *   m — 數字線 Number Line   (maths, Numberblocks S1–S3 progression)
+ *   c — 香港中文線 Chinese Line (Trad. Chinese via HK life, themed clusters)
  *   e — English Line          (phonics, first words, bilingual bridge)
  *
- * Station types:
- *   count  — count a tower of blocks, pick the numeral (opts: min,max, mode:'onemore')
- *   add    — two towers, pick the total (opts: max)
- *   match  — tap a word tile, tap its picture tile (pairs: a=word, b=picture,
- *            j=jyutping, e=english gloss, sub=bridge hint shown under the word)
+ * Station types / engines:
+ *   match    — tap a word tile, tap its picture tile (pairs: a=word, b=picture,
+ *              j=jyutping, e=english gloss, sub=bridge hint under the word)
+ *   listen   — hear the word, tap the right character (pool of pairs)
+ *   talk     — pick the right conversational reply (dialogs)
+ *   factory  — combine component blocks into a compound character (builds)
+ *   memory   — pelmanism: flip cards to pair character ↔ picture (pairs)
+ *   sentence — arrange word carriages into a sentence (sentences)
+ *   count    — count a tower of blocks (min, max, mode:'onemore')
+ *   add      — two towers, pick the total (max)
+ *   peek     — subitising: tower flashes then hides (min, max)
+ *   takeaway — blocks hop off, how many left (max, allowZero)
+ *   bond     — part-part-whole: N = a + ? (max)
+ *   double   — mirror the tower, what is the double (max = biggest addend)
+ *   oddeven  — do the blocks pair up? odd or even (max)
+ *   fivebit  — 6–10 as "five and a bit": how big is the bit (Numberblocks S3)
+ *   maketen  — which number joins a to make 10
+ *
+ * `theme` groups stations under a header on the line map. Station ids are
+ * permanent — progress is keyed on them, so never rename existing ids.
  */
 
 const LINES = [
@@ -21,24 +36,39 @@ const LINES = [
     color: 'var(--blue)',
     colorKey: 'blue',
     stations: [
-      { id: 'm1', name: '數到三', en: 'Count to 3',  icon: '3',  type: 'count', min: 1, max: 3 },
-      { id: 'm2', name: '數到五', en: 'Count to 5',  icon: '5',  type: 'count', min: 2, max: 5 },
-      { id: 'm3', name: '數到十', en: 'Count to 10', icon: '10', type: 'count', min: 5, max: 10 },
-      { id: 'm4', name: '數字配對', en: 'Match 1–5', icon: '＝', type: 'match', lang: 'num',
+      /* —— 數吓數吓 counting (Numberblocks S1) —— */
+      { id: 'm1', theme: '數吓數吓', name: '數到三', en: 'Count to 3',  icon: '3',  type: 'count', min: 1, max: 3 },
+      { id: 'm2', theme: '數吓數吓', name: '數到五', en: 'Count to 5',  icon: '5',  type: 'count', min: 2, max: 5 },
+      { id: 'm3', theme: '數吓數吓', name: '數到十', en: 'Count to 10', icon: '10', type: 'count', min: 5, max: 10 },
+      { id: 'm9', theme: '數吓數吓', name: '瞬間睇', en: 'Quick Peek',  icon: '👀', type: 'peek', min: 2, max: 6 },
+
+      /* —— 認數 numerals (S1) —— */
+      { id: 'm4', theme: '認數', name: '數字配對', en: 'Match 1–5', icon: '＝', type: 'match', lang: 'num',
         pairs: [
           { a: '2', b: '🟦🟦', e: 'two' },
           { a: '3', b: '🟦🟦🟦', e: 'three' },
           { a: '5', b: '🟦🟦🟦🟦🟦', e: 'five' },
         ] },
-      { id: 'm5', name: '數字配對二', en: 'Match 6–10', icon: '＝', type: 'match', lang: 'num',
+      { id: 'm5', theme: '認數', name: '數字配對二', en: 'Match 6–10', icon: '＝', type: 'match', lang: 'num',
         pairs: [
           { a: '6',  b: '🟨🟨🟨<br>🟨🟨🟨', e: 'six' },
           { a: '8',  b: '🟨🟨🟨🟨<br>🟨🟨🟨🟨', e: 'eight' },
           { a: '10', b: '🟨🟨🟨🟨🟨<br>🟨🟨🟨🟨🟨', e: 'ten' },
         ] },
-      { id: 'm6', name: '多一個', en: 'One more', icon: '+1', type: 'count', min: 1, max: 9, mode: 'onemore' },
-      { id: 'm7', name: '加加睇', en: 'Add to 5',  icon: '+',  type: 'add', max: 5 },
-      { id: 'm8', name: '加到十', en: 'Add to 10', icon: '+',  type: 'add', max: 10 },
+      { id: 'm6', theme: '認數', name: '多一個', en: 'One more', icon: '+1', type: 'count', min: 1, max: 9, mode: 'onemore' },
+
+      /* —— 加加減減 add & take away (S1–S2) —— */
+      { id: 'm7',  theme: '加加減減', name: '加加睇', en: 'Add to 5',   icon: '+', type: 'add', max: 5 },
+      { id: 'm10', theme: '加加減減', name: '減減睇', en: 'Hop off',    icon: '−', type: 'takeaway', max: 5 },
+      { id: 'm11', theme: '加加減減', name: '拆數橋', en: 'Bond Bridge', icon: '⌒', type: 'bond', max: 5 },
+      { id: 'm8',  theme: '加加減減', name: '加到十', en: 'Add to 10',  icon: '+', type: 'add', max: 10 },
+      { id: 'm13', theme: '加加減減', name: '零之站', en: 'Zero Hero',  icon: '0', type: 'takeaway', max: 4, allowZero: true },
+
+      /* —— 大數字戲法 number tricks (S2–S3) —— */
+      { id: 'm12', theme: '大數字戲法', name: '孖孖站', en: 'Twins (doubles)', icon: '×2', type: 'double', max: 5 },
+      { id: 'm14', theme: '大數字戲法', name: '單雙站', en: 'Odd or even',     icon: '⁝',  type: 'oddeven', max: 10 },
+      { id: 'm15', theme: '大數字戲法', name: '五加幾', en: 'Five and a bit',  icon: '5+', type: 'fivebit' },
+      { id: 'm16', theme: '大數字戲法', name: '合十朋友', en: 'Make ten',      icon: '10', type: 'maketen' },
     ],
   },
   {
@@ -48,56 +78,272 @@ const LINES = [
     color: 'var(--red)',
     colorKey: 'red',
     stations: [
-      { id: 'c1', name: '早晨站', en: 'Good Morning', icon: '日', type: 'match', lang: 'zh',
+      /* —— 我的一天 daily life —— */
+      { id: 'c1', theme: '我的一天', name: '早晨站', en: 'Good Morning', icon: '日', type: 'match', lang: 'zh',
         pairs: [
           { a: '日', b: '☀️', j: 'jat6',  e: 'sun' },
           { a: '月', b: '🌙', j: 'jyut6', e: 'moon' },
           { a: '人', b: '🚶', j: 'jan4',  e: 'person' },
         ] },
-      { id: 'c2', name: '食飯站', en: 'Yum Yum', icon: '食', type: 'match', lang: 'zh',
+      { id: 'c2', theme: '我的一天', name: '食飯站', en: 'Yum Yum', icon: '食', type: 'match', lang: 'zh',
         pairs: [
           { a: '食', b: '🍽️', j: 'sik6',  e: 'eat' },
           { a: '飯', b: '🍚', j: 'faan6', e: 'rice' },
           { a: '水', b: '💧', j: 'seoi2', e: 'water' },
           { a: '茶', b: '🍵', j: 'caa4',  e: 'tea' },
         ] },
-      { id: 'c3', name: '大細站', en: 'Big & Small', icon: '大', type: 'match', lang: 'zh',
+      { id: 'c3', theme: '我的一天', name: '大細站', en: 'Big & Small', icon: '大', type: 'match', lang: 'zh',
         pairs: [
           { a: '大', b: '🐘', j: 'daai6', e: 'big' },
           { a: '小', b: '🐁', j: 'siu2',  e: 'small' },
           { a: '手', b: '✋', j: 'sau2',  e: 'hand' },
           { a: '口', b: '👄', j: 'hau2',  e: 'mouth' },
         ] },
-      { id: 'c4', name: '中環站', en: 'Central', icon: '中', type: 'match', lang: 'zh',
+
+      /* —— 搭港鐵 MTR —— */
+      { id: 'c4', theme: '搭港鐵', name: '中環站', en: 'Central', icon: '中', type: 'match', lang: 'zh',
         pairs: [
           { a: '中環', b: '🏙️', j: 'zung1 waan4', e: 'Central' },
           { a: '山頂', b: '⛰️', j: 'saan1 deng2', e: 'The Peak' },
           { a: '迪士尼', b: '🏰', j: 'dik6 si6 nei4', e: 'Disneyland' },
         ] },
-      { id: 'c5', name: '搭港鐵站', en: 'MTR Ride', icon: '鐵', type: 'match', lang: 'zh',
+      { id: 'c5', theme: '搭港鐵', name: '搭港鐵站', en: 'MTR Ride', icon: '鐵', type: 'match', lang: 'zh',
         pairs: [
           { a: '旺角', b: '🛍️', j: 'wong6 gok3',  e: 'Mong Kok' },
           { a: '沙田', b: '🐎', j: 'saa1 tin4',   e: 'Sha Tin' },
           { a: '東涌', b: '🚠', j: 'dung1 cung1', e: 'Tung Chung' },
         ] },
-      { id: 'c6', name: '山頂站', en: 'The Peak', icon: '山', type: 'match', lang: 'zh',
+
+      /* —— 遊香港 sightseeing —— */
+      { id: 'c6', theme: '遊香港', name: '山頂站', en: 'The Peak', icon: '山', type: 'match', lang: 'zh',
         pairs: [
           { a: '山', b: '⛰️', j: 'saan1',  e: 'mountain' },
           { a: '上', b: '⬆️', j: 'soeng6', e: 'up' },
           { a: '下', b: '⬇️', j: 'haa6',   e: 'down' },
         ] },
-      { id: 'c7', name: '天星站', en: 'Star Ferry', icon: '星', type: 'match', lang: 'zh',
+      { id: 'c7', theme: '遊香港', name: '天星站', en: 'Star Ferry', icon: '星', type: 'match', lang: 'zh',
         pairs: [
           { a: '天', b: '🌥️', j: 'tin1',  e: 'sky' },
           { a: '星', b: '⭐', j: 'sing1', e: 'star' },
           { a: '船', b: '⛴️', j: 'syun4', e: 'boat' },
         ] },
-      { id: 'c8', name: '海洋站', en: 'Ocean Park', icon: '海', type: 'match', lang: 'zh',
+      { id: 'c8', theme: '遊香港', name: '海洋站', en: 'Ocean Park', icon: '海', type: 'match', lang: 'zh',
         pairs: [
           { a: '海', b: '🌊', j: 'hoi2', e: 'sea' },
           { a: '魚', b: '🐠', j: 'jyu2', e: 'fish' },
           { a: '花', b: '🌸', j: 'faa1', e: 'flower' },
           { a: '樹', b: '🌳', j: 'syu6', e: 'tree' },
+        ] },
+
+      /* —— 屋企 family —— */
+      { id: 'c9', theme: '屋企', name: '屋企站', en: 'My Family', icon: '家', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '爸爸', b: '👨', j: 'baa4 baa1',  e: 'daddy' },
+          { a: '媽媽', b: '👩', j: 'maa4 maa1',  e: 'mummy' },
+          { a: '哥哥', b: '👦', j: 'go4 go1',    e: 'big brother' },
+          { a: '姐姐', b: '👧', j: 'ze4 ze1',    e: 'big sister' },
+          { a: '妹妹', b: '👶', j: 'mui4 mui2',  e: 'little sister' },
+          { a: '我',   b: '🐼', j: 'ngo5',       e: 'me' },
+        ] },
+      { id: 'c10', theme: '屋企', name: '屋企・聽字', en: 'Family — listen', icon: '👂', type: 'listen', lang: 'zh',
+        pool: [
+          { a: '爸爸', j: 'baa4 baa1', e: 'daddy' },
+          { a: '媽媽', j: 'maa4 maa1', e: 'mummy' },
+          { a: '哥哥', j: 'go4 go1',   e: 'big brother' },
+          { a: '姐姐', j: 'ze4 ze1',   e: 'big sister' },
+          { a: '妹妹', j: 'mui4 mui2', e: 'little sister' },
+          { a: '我',   j: 'ngo5',      e: 'me' },
+        ] },
+      { id: 'c11', theme: '屋企', name: '屋企・傾偈', en: 'Family — talk', icon: '💬', type: 'talk', lang: 'zh',
+        dialogs: [
+          { icon: '👩', say: '早晨！', e: 'Good morning!',
+            opts: [ { t: '早晨呀，媽媽！', ok: true }, { t: '拜拜！', ok: false } ] },
+          { icon: '👨', say: '呢粒糖畀你。', e: 'This sweet is for you.',
+            opts: [ { t: '多謝爸爸！', ok: true }, { t: '唔使客氣。', ok: false } ] },
+          { icon: '👧', say: '多謝你呀！', e: 'Thank you!',
+            opts: [ { t: '唔使客氣！', ok: true }, { t: '早晨！', ok: false } ] },
+        ] },
+
+      /* —— 飲茶 dim sum —— */
+      { id: 'c12', theme: '飲茶', name: '茶樓站', en: 'Dim Sum', icon: '點', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '蝦餃', b: '🥟', j: 'haa1 gaau2',  e: 'shrimp dumpling' },
+          { a: '燒賣', b: '🍢', j: 'siu1 maai2',  e: 'siu mai' },
+          { a: '蛋撻', b: '🥧', j: 'daan6 taat1', e: 'egg tart' },
+          { a: '奶茶', b: '🧋', j: 'naai5 caa4',  e: 'milk tea' },
+          { a: '粥',   b: '🥣', j: 'zuk1',        e: 'congee' },
+        ] },
+      { id: 'c13', theme: '飲茶', name: '茶樓・聽字', en: 'Dim sum — listen', icon: '👂', type: 'listen', lang: 'zh',
+        pool: [
+          { a: '蝦餃', j: 'haa1 gaau2',  e: 'shrimp dumpling' },
+          { a: '燒賣', j: 'siu1 maai2',  e: 'siu mai' },
+          { a: '蛋撻', j: 'daan6 taat1', e: 'egg tart' },
+          { a: '奶茶', j: 'naai5 caa4',  e: 'milk tea' },
+          { a: '飲',   j: 'jam2',        e: 'drink' },
+          { a: '食',   j: 'sik6',        e: 'eat' },
+        ] },
+      { id: 'c14', theme: '飲茶', name: '茶樓・傾偈', en: 'Dim sum — talk', icon: '💬', type: 'talk', lang: 'zh',
+        dialogs: [
+          { icon: '🧑‍🍳', say: '你想食咩呀？', e: 'What would you like to eat?',
+            opts: [ { t: '我想食蝦餃，唔該。', ok: true }, { t: '我唔知呀。', ok: false } ] },
+          { icon: '👩', say: '飲唔飲茶呀？', e: 'Would you like some tea?',
+            opts: [ { t: '飲，唔該！', ok: true }, { t: '早晨！', ok: false } ] },
+          { icon: '🧑‍🍳', say: '蛋撻嚟喇！', e: 'Here comes the egg tart!',
+            opts: [ { t: '多謝！', ok: true }, { t: '拜拜！', ok: false } ] },
+        ] },
+
+      /* —— 顏色 colours —— */
+      { id: 'c15', theme: '顏色', name: '顏色站', en: 'Colours', icon: '紅', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '紅', b: '🔴', j: 'hung4', e: 'red' },
+          { a: '黃', b: '🟡', j: 'wong4', e: 'yellow' },
+          { a: '藍', b: '🔵', j: 'laam4', e: 'blue' },
+          { a: '綠', b: '🟢', j: 'luk6',  e: 'green' },
+          { a: '黑', b: '⚫', j: 'hak1',  e: 'black' },
+          { a: '白', b: '⚪', j: 'baak6', e: 'white' },
+        ] },
+      { id: 'c16', theme: '顏色', name: '顏色・翻卡', en: 'Colours — memory', icon: '🎴', type: 'memory', lang: 'zh',
+        pairs: [
+          { a: '紅', b: '🔴', j: 'hung4', e: 'red' },
+          { a: '黃', b: '🟡', j: 'wong4', e: 'yellow' },
+          { a: '藍', b: '🔵', j: 'laam4', e: 'blue' },
+          { a: '綠', b: '🟢', j: 'luk6',  e: 'green' },
+        ] },
+
+      /* —— 數字 numbers (bridge with Number Line) —— */
+      { id: 'c17', theme: '數字', name: '數字站', en: 'Numbers in Chinese', icon: '三', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '一', b: '🟥', j: 'jat1',  e: 'one' },
+          { a: '二', b: '🟧🟧', j: 'ji6', e: 'two' },
+          { a: '三', b: '🟨🟨🟨', j: 'saam1', e: 'three' },
+          { a: '四', b: '🟩🟩<br>🟩🟩', j: 'sei3', e: 'four' },
+          { a: '五', b: '🟦🟦🟦<br>🟦🟦', j: 'ng5', e: 'five' },
+        ] },
+      { id: 'c18', theme: '數字', name: '數字・聽字', en: 'Numbers — listen', icon: '👂', type: 'listen', lang: 'zh',
+        pool: [
+          { a: '一', j: 'jat1', e: 'one' },   { a: '二', j: 'ji6', e: 'two' },
+          { a: '三', j: 'saam1', e: 'three' },{ a: '四', j: 'sei3', e: 'four' },
+          { a: '五', j: 'ng5', e: 'five' },   { a: '六', j: 'luk6', e: 'six' },
+          { a: '七', j: 'cat1', e: 'seven' }, { a: '八', j: 'baat3', e: 'eight' },
+          { a: '九', j: 'gau2', e: 'nine' },  { a: '十', j: 'sap6', e: 'ten' },
+        ] },
+
+      /* —— 身體 body —— */
+      { id: 'c19', theme: '身體', name: '身體站', en: 'My Body', icon: '手', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '頭', b: '👤', j: 'tau4',  e: 'head' },
+          { a: '眼', b: '👁️', j: 'ngaan5', e: 'eye' },
+          { a: '耳', b: '👂', j: 'ji5',   e: 'ear' },
+          { a: '口', b: '👄', j: 'hau2',  e: 'mouth' },
+          { a: '手', b: '✋', j: 'sau2',  e: 'hand' },
+          { a: '腳', b: '🦶', j: 'goek3', e: 'foot' },
+        ] },
+      { id: 'c20', theme: '身體', name: '身體・翻卡', en: 'Body — memory', icon: '🎴', type: 'memory', lang: 'zh',
+        pairs: [
+          { a: '眼', b: '👁️', j: 'ngaan5', e: 'eye' },
+          { a: '耳', b: '👂', j: 'ji5',   e: 'ear' },
+          { a: '手', b: '✋', j: 'sau2',  e: 'hand' },
+          { a: '腳', b: '🦶', j: 'goek3', e: 'foot' },
+        ] },
+
+      /* —— 砌字工場 character factory (compositional awareness) —— */
+      { id: 'c21', theme: '砌字工場', name: '砌字工場一', en: 'Character Factory 1', icon: '🏗️', type: 'factory', lang: 'zh',
+        builds: [
+          { parts: ['日', '月'], result: '明', j: 'ming4', e: 'bright', pic: '✨' },
+          { parts: ['木', '木'], result: '林', j: 'lam4',  e: 'woods',  pic: '🌲🌲' },
+          { parts: ['火', '火'], result: '炎', j: 'jim4',  e: 'blazing', pic: '🔥' },
+        ] },
+      { id: 'c22', theme: '砌字工場', name: '砌字工場二', en: 'Character Factory 2', icon: '🏗️', type: 'factory', lang: 'zh',
+        builds: [
+          { parts: ['女', '子'], result: '好', j: 'hou2', e: 'good', pic: '👍' },
+          { parts: ['人', '木'], result: '休', j: 'jau1', e: 'rest', pic: '😴' },
+          { parts: ['木', '木', '木'], result: '森', j: 'sam1', e: 'forest', pic: '🌳🌳🌳' },
+        ] },
+
+      /* —— 講句子 sentences —— */
+      { id: 'c23', theme: '講句子', name: '句子火車一', en: 'Sentence Train 1', icon: '🚂', type: 'sentence', lang: 'zh',
+        sentences: [
+          { words: ['我', '食', '飯'],   pic: '🐼🍚', e: 'I eat rice.' },
+          { words: ['我', '飲', '水'],   pic: '🐼💧', e: 'I drink water.' },
+          { words: ['我', '食', '蛋撻'], pic: '🐼🥧', e: 'I eat an egg tart.' },
+        ] },
+      { id: 'c24', theme: '講句子', name: '句子火車二', en: 'Sentence Train 2', icon: '🚂', type: 'sentence', lang: 'zh',
+        sentences: [
+          { words: ['我', '去', '山頂'],   pic: '🐼⛰️', e: 'I go to the Peak.' },
+          { words: ['爸爸', '飲', '茶'],   pic: '👨🍵', e: 'Daddy drinks tea.' },
+          { words: ['媽媽', '食', '燒賣'], pic: '👩🍢', e: 'Mummy eats siu mai.' },
+        ] },
+
+      /* —— 天氣 weather —— */
+      { id: 'c25', theme: '天氣', name: '天氣站', en: 'Weather', icon: '雨', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '太陽', b: '☀️', j: 'taai3 joeng4', e: 'sun' },
+          { a: '雨',   b: '🌧️', j: 'jyu5',  e: 'rain' },
+          { a: '風',   b: '💨', j: 'fung1', e: 'wind' },
+          { a: '熱',   b: '🥵', j: 'jit6',  e: 'hot' },
+          { a: '凍',   b: '🥶', j: 'dung3', e: 'cold' },
+        ] },
+      { id: 'c26', theme: '天氣', name: '天氣・傾偈', en: 'Weather — talk', icon: '💬', type: 'talk', lang: 'zh',
+        dialogs: [
+          { icon: '👩', say: '今日落雨呀，要帶咩呀？', e: 'It is raining — what should we bring?',
+            opts: [ { t: '帶遮！☂️', ok: true }, { t: '帶雪糕！🍦', ok: false } ] },
+          { icon: '👨', say: '今日好熱呀！', e: 'It is so hot today!',
+            opts: [ { t: '飲多啲水啦！', ok: true }, { t: '着多件衫啦！', ok: false } ] },
+          { icon: '👧', say: '今日好凍呀！', e: 'It is so cold today!',
+            opts: [ { t: '着多件衫啦！', ok: true }, { t: '食雪糕啦！', ok: false } ] },
+        ] },
+
+      /* —— 街市 market —— */
+      { id: 'c27', theme: '街市', name: '街市站', en: 'Wet Market', icon: '菜', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '菜',   b: '🥬', j: 'coi3',  e: 'vegetables' },
+          { a: '魚',   b: '🐟', j: 'jyu2',  e: 'fish' },
+          { a: '蛋',   b: '🥚', j: 'daan2', e: 'egg' },
+          { a: '蘋果', b: '🍎', j: 'ping4 gwo2', e: 'apple' },
+          { a: '橙',   b: '🍊', j: 'caang2', e: 'orange' },
+        ] },
+      { id: 'c28', theme: '街市', name: '街市・翻卡', en: 'Market — memory', icon: '🎴', type: 'memory', lang: 'zh',
+        pairs: [
+          { a: '菜',   b: '🥬', j: 'coi3',  e: 'vegetables' },
+          { a: '蛋',   b: '🥚', j: 'daan2', e: 'egg' },
+          { a: '蘋果', b: '🍎', j: 'ping4 gwo2', e: 'apple' },
+          { a: '橙',   b: '🍊', j: 'caang2', e: 'orange' },
+        ] },
+
+      /* —— 出街 transport —— */
+      { id: 'c29', theme: '出街', name: '交通站', en: 'Transport', icon: '車', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '巴士', b: '🚌', j: 'baa1 si2',  e: 'bus' },
+          { a: '的士', b: '🚕', j: 'dik1 si2',  e: 'taxi' },
+          { a: '電車', b: '🚋', j: 'din6 ce1',  e: 'tram (ding ding)' },
+          { a: '船',   b: '⛴️', j: 'syun4',     e: 'boat' },
+          { a: '飛機', b: '✈️', j: 'fei1 gei1', e: 'plane' },
+        ] },
+      { id: 'c30', theme: '出街', name: '交通・聽字', en: 'Transport — listen', icon: '👂', type: 'listen', lang: 'zh',
+        pool: [
+          { a: '巴士', j: 'baa1 si2',  e: 'bus' },
+          { a: '的士', j: 'dik1 si2',  e: 'taxi' },
+          { a: '電車', j: 'din6 ce1',  e: 'tram' },
+          { a: '船',   j: 'syun4',     e: 'boat' },
+          { a: '飛機', j: 'fei1 gei1', e: 'plane' },
+        ] },
+
+      /* —— 節日 festivals —— */
+      { id: 'c31', theme: '節日', name: '節日站', en: 'Festivals', icon: '🧧', type: 'match', lang: 'zh',
+        pairs: [
+          { a: '新年', b: '🎆', j: 'san1 nin4',    e: 'New Year' },
+          { a: '利是', b: '🧧', j: 'lai6 si6',     e: 'red packet' },
+          { a: '月餅', b: '🥮', j: 'jyut6 beng2',  e: 'mooncake' },
+          { a: '燈籠', b: '🏮', j: 'dang1 lung4',  e: 'lantern' },
+        ] },
+      { id: 'c32', theme: '節日', name: '節日・傾偈', en: 'Festivals — talk', icon: '💬', type: 'talk', lang: 'zh',
+        dialogs: [
+          { icon: '👴', say: '恭喜發財！', e: 'Kung hei fat choi!',
+            opts: [ { t: '利是逗嚟！🧧', ok: true }, { t: '晚安！', ok: false } ] },
+          { icon: '👵', say: '中秋節快樂！', e: 'Happy Mid-Autumn Festival!',
+            opts: [ { t: '一齊食月餅啦！', ok: true }, { t: '一齊食蛋撻啦！', ok: false } ] },
+          { icon: '👨', say: '新年快樂！', e: 'Happy New Year!',
+            opts: [ { t: '新年快樂！身體健康！', ok: true }, { t: '唔該晒！', ok: false } ] },
         ] },
     ],
   },
@@ -108,50 +354,50 @@ const LINES = [
     color: 'var(--green)',
     colorKey: 'green',
     stations: [
-      { id: 'e1', name: 's · a · t', en: 'Letter sounds', icon: 's', type: 'match', lang: 'en',
+      { id: 'e1', theme: 'Phonics', name: 's · a · t', en: 'Letter sounds', icon: 's', type: 'match', lang: 'en',
         pairs: [
           { a: 's', b: '🐍', e: 'snake' },
           { a: 'a', b: '🍎', e: 'apple' },
           { a: 't', b: '🐯', e: 'tiger' },
         ] },
-      { id: 'e2', name: 'p · i · n', en: 'Letter sounds', icon: 'p', type: 'match', lang: 'en',
+      { id: 'e2', theme: 'Phonics', name: 'p · i · n', en: 'Letter sounds', icon: 'p', type: 'match', lang: 'en',
         pairs: [
           { a: 'p', b: '🐷', e: 'pig' },
           { a: 'i', b: '🐛', e: 'insect' },
           { a: 'n', b: '👃', e: 'nose' },
         ] },
-      { id: 'e3', name: 'First words', en: 'cat · sun · bus', icon: 'c', type: 'match', lang: 'en',
+      { id: 'e3', theme: 'Words', name: 'First words', en: 'cat · sun · bus', icon: 'c', type: 'match', lang: 'en',
         pairs: [
           { a: 'cat', b: '🐱', e: 'cat' },
           { a: 'sun', b: '☀️', e: 'sun' },
           { a: 'bus', b: '🚌', e: 'bus' },
         ] },
-      { id: 'e4', name: 'More words', en: 'dog · egg · hat', icon: 'd', type: 'match', lang: 'en',
+      { id: 'e4', theme: 'Words', name: 'More words', en: 'dog · egg · hat', icon: 'd', type: 'match', lang: 'en',
         pairs: [
           { a: 'dog', b: '🐶', e: 'dog' },
           { a: 'egg', b: '🥚', e: 'egg' },
           { a: 'hat', b: '🎩', e: 'hat' },
         ] },
-      { id: 'e5', name: 'Colours', en: 'red · blue · green', icon: '🎨', type: 'match', lang: 'en',
+      { id: 'e5', theme: 'Words', name: 'Colours', en: 'red · blue · green', icon: '🎨', type: 'match', lang: 'en',
         pairs: [
           { a: 'red',    b: '🔴', e: 'red' },
           { a: 'blue',   b: '🔵', e: 'blue' },
           { a: 'green',  b: '🟢', e: 'green' },
           { a: 'yellow', b: '🟡', e: 'yellow' },
         ] },
-      { id: 'e6', name: 'Animals', en: 'fish · bird · horse', icon: '🐟', type: 'match', lang: 'en',
+      { id: 'e6', theme: 'Words', name: 'Animals', en: 'fish · bird · horse', icon: '🐟', type: 'match', lang: 'en',
         pairs: [
           { a: 'fish',  b: '🐟', e: 'fish' },
           { a: 'bird',  b: '🐦', e: 'bird' },
           { a: 'horse', b: '🐴', e: 'horse' },
         ] },
-      { id: 'e7', name: 'HK Bridge 一', en: 'Two languages, one word', icon: '⛰️', type: 'match', lang: 'en',
+      { id: 'e7', theme: 'HK Bridge', name: 'HK Bridge 一', en: 'Two languages, one word', icon: '⛰️', type: 'match', lang: 'en',
         pairs: [
           { a: 'mountain', sub: '山', b: '⛰️', e: 'mountain' },
           { a: 'star',     sub: '星', b: '⭐', e: 'star' },
           { a: 'sea',      sub: '海', b: '🌊', e: 'sea' },
         ] },
-      { id: 'e8', name: 'HK Bridge 二', en: 'Two languages, one word', icon: '⛴️', type: 'match', lang: 'en',
+      { id: 'e8', theme: 'HK Bridge', name: 'HK Bridge 二', en: 'Two languages, one word', icon: '⛴️', type: 'match', lang: 'en',
         pairs: [
           { a: 'water', sub: '水', b: '💧', e: 'water' },
           { a: 'boat',  sub: '船', b: '⛴️', e: 'boat' },

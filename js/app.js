@@ -1,12 +1,15 @@
-/* 小站長 Little Station Master — app shell + game engines.
- * No build step, no dependencies. See js/data.js for curriculum,
- * js/store.js for persistence/sync.
+/* 小站長 Little Station Master — app shell + game engines (v2).
+ * No build step, no dependencies. Curriculum: js/data.js. Persistence: js/store.js.
+ *
+ * Engines: match · listen · talk · factory · memory · sentence
+ *          count · add · peek · takeaway · bond · double · oddeven · fivebit · maketen
  */
 
 const $  = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const shuffle = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
 const pickFrom = a => a[Math.floor(Math.random() * a.length)];
+const randInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
 /* ---------- speech (Cantonese / English) ---------- */
 function speak(text, lang) {
@@ -130,6 +133,7 @@ const App = {
   renderLine() {
     const l = this.currentLine;
     if (!l) return;
+    let lastTheme = null;
     $('#scr-line').innerHTML = `
       <div class="gamehead">
         <button class="back" onclick="App.show('home')">‹</button>
@@ -141,7 +145,12 @@ const App = {
           const unlocked = Store.isUnlocked(l, i);
           const done = Store.isDone(s.id);
           const gold = Store.isMastered(s.id);
-          return `
+          let head = '';
+          if (s.theme && s.theme !== lastTheme) {
+            lastTheme = s.theme;
+            head = `<div class="themehead"><span style="color:${l.color}">◈</span> ${s.theme}</div>`;
+          }
+          return head + `
           <button class="stationrow ${unlocked ? '' : 'locked'}"
                   ${unlocked ? `onclick="App.openStation('${l.id}','${s.id}')"` : 'disabled'}>
             <span class="mapdot ${done ? 'done' : ''}" style="border-color:${l.color}">
@@ -195,10 +204,20 @@ const App = {
     this.renderParentPanel();
   },
 
+  knownChars() {
+    const seen = new Set();
+    LINES.find(l => l.id === 'c').stations.forEach(s => {
+      if (!Store.isDone(s.id)) return;
+      (s.pairs || []).forEach(p => seen.add(p.a));
+      (s.pool || []).forEach(p => seen.add(p.a));
+      (s.builds || []).forEach(b => { b.parts.forEach(x => seen.add(x)); seen.add(b.result); });
+      (s.sentences || []).forEach(x => x.words.forEach(w => seen.add(w)));
+    });
+    return [...seen];
+  },
+
   renderParentPanel() {
-    const known = LINES.find(l => l.id === 'c').stations
-      .filter(s => Store.isDone(s.id))
-      .flatMap(s => s.pairs.map(p => p.a));
+    const known = this.knownChars();
     $('#parent-progress').innerHTML = `
       <div class="card">
         <div class="row spread">
@@ -221,7 +240,7 @@ const App = {
             <div class="track"><span class="fill" style="width:${Math.round(done / total * 100)}%;background:${l.color}"></span></div>
           </div>`;
         }).join('')}
-        <p class="sub">識咗嘅字 Characters known（${known.length}）：${known.join('、') || '未開始'}</p>
+        <p class="sub">識咗嘅字詞 Words known（${known.length}）：${known.join('、') || '未開始'}</p>
       </div>
       <div class="card">
         <h2 style="margin-bottom:4px">設定 Settings</h2>
@@ -277,18 +296,32 @@ const App = {
  * Game engines
  * ============================================================ */
 
+const ROUNDS_BY_TYPE = {
+  match: 1, memory: 1,
+  count: 3, add: 3, peek: 3, takeaway: 3, bond: 3, double: 3,
+  oddeven: 3, fivebit: 3, maketen: 3,
+  listen: 4,
+};
+
 const Game = {
   line: null, st: null,
   round: 0, rounds: 3,
   matched: 0, selWord: null, selPic: null, misses: 0,
-  target: 0, addends: null,
+  target: 0, busy: false, lastKey: null,
+  memFirst: null, memLock: false,
+  factorySlots: [],
 
   start(line, st) {
     this.line = line;
     this.st = st;
     this.round = 0;
     this.misses = 0;
-    this.rounds = st.type === 'match' ? 1 : 3;
+    this.busy = false;
+    this.lastKey = null;
+    this.rounds = st.type === 'talk' ? st.dialogs.length
+      : st.type === 'factory' ? st.builds.length
+      : st.type === 'sentence' ? st.sentences.length
+      : (ROUNDS_BY_TYPE[st.type] || 3);
     this.renderShell();
     this.nextRound();
   },
@@ -311,10 +344,34 @@ const Game = {
 
   nextRound() {
     this.misses = 0;
-    if (this.st.type === 'match') this.buildMatch();
-    else if (this.st.type === 'add') this.buildAdd();
+    this.busy = false;
+    const t = this.st.type;
+    if (t === 'match')    this.buildMatch();
+    else if (t === 'listen')   this.buildListen();
+    else if (t === 'talk')     this.buildTalk();
+    else if (t === 'factory')  this.buildFactory();
+    else if (t === 'memory')   this.buildMemory();
+    else if (t === 'sentence') this.buildSentence();
+    else if (t === 'add')      this.buildAdd();
+    else if (t === 'peek')     this.buildPeek();
+    else if (t === 'takeaway') this.buildTakeaway();
+    else if (t === 'bond')     this.buildBond();
+    else if (t === 'double')   this.buildDouble();
+    else if (t === 'oddeven')  this.buildOddEven();
+    else if (t === 'fivebit')  this.buildFivebit();
+    else if (t === 'maketen')  this.buildMaketen();
     else this.buildCount();
     if (this.rounds > 1) this.pips();
+  },
+
+  roundWon(delayNext = 750) {
+    this.round++;
+    if (this.rounds > 1) this.pips();
+    if (this.round >= this.rounds) {
+      setTimeout(() => this.finishStation(), 500);
+    } else {
+      setTimeout(() => this.nextRound(), delayNext);
+    }
   },
 
   finishStation() {
@@ -330,7 +387,9 @@ const Game = {
     speak(praise.zh, 'zh');
   },
 
-  /* ---------- MATCH ---------- */
+  speakLang() { return this.st.lang === 'en' ? 'en' : 'zh'; },
+
+  /* ================= MATCH ================= */
   buildMatch() {
     this.matched = 0;
     this.selWord = this.selPic = null;
@@ -341,7 +400,7 @@ const Game = {
       : (this.st.lang === 'num'
         ? '將數字同方塊配對！<br>Match the number to the blocks.'
         : 'Tap a word, then its picture. 🔊');
-    const cols = Math.min(pairs.length, 4);
+    const cols = pairs.length <= 4 ? pairs.length : 3;
     $('#gboard').innerHTML = `
       <div class="pairgrid" id="wordRow" style="grid-template-columns:repeat(${cols},1fr)"></div>
       <div class="pairgrid" id="picRow"  style="grid-template-columns:repeat(${cols},1fr);margin-top:12px"></div>`;
@@ -351,7 +410,7 @@ const Game = {
       b.className = 'tile' + (p.a.length > 2 ? ' longword' : '');
       b.dataset.key = p.a;
       b.innerHTML = `${p.a}<small>${p.sub || p.j || ''}</small>`;
-      b.onclick = () => { speak(p.a, this.st.lang === 'zh' ? 'zh' : 'en'); this.pick(b, 'word'); };
+      b.onclick = () => { speak(p.a, this.speakLang()); this.pick(b, 'word'); };
       wr.appendChild(b);
     });
     shuffle([...pairs]).forEach(p => {
@@ -378,7 +437,6 @@ const Game = {
       a.classList.remove('sel'); b.classList.remove('sel');
       a.classList.add('matched'); b.classList.add('matched');
       this.matched++;
-      $('#gstars').textContent = Store.data.stars;
       if (this.matched === this.st.pairs.length) {
         setTimeout(() => this.finishStation(), 550);
       }
@@ -387,7 +445,6 @@ const Game = {
       a.classList.add('wrong'); b.classList.add('wrong');
       toast(this.misses >= 2 ? '一齊搵吓⋯ Let’s look together!' : pickFrom(NUDGE).zh + ' ' + pickFrom(NUDGE).en);
       if (this.misses >= 2) {
-        /* After two misses, glow the correct picture — teach, don't fail. */
         const hint = $$('#picRow .tile:not(.matched)');
         hint.forEach(t => { if (t.dataset.key === a.dataset.key) t.classList.add('hint'); });
         setTimeout(() => hint.forEach(t => t.classList.remove('hint')), 1600);
@@ -399,13 +456,305 @@ const Game = {
     }
   },
 
-  /* ---------- COUNT / ONE-MORE ---------- */
+  /* ================= LISTEN & FIND ================= */
+  buildListen() {
+    const pool = this.st.pool;
+    const target = pickFrom(pool.filter(p => p.a !== this.lastKey));
+    this.lastKey = target.a;
+    this.target = target;
+    const options = shuffle([target, ...shuffle(pool.filter(p => p.a !== target.a)).slice(0, 2)]);
+    $('#gprompt').innerHTML = '你聽到邊個字？撳個喇叭再聽多次。<br>Tap the word you hear.';
+    $('#gboard').innerHTML = `
+      <div class="listenhub">
+        <button class="speakerbtn" id="replay">🔊</button>
+        <span class="sub">再聽 replay</span>
+      </div>
+      <div class="pairgrid" id="listenRow" style="grid-template-columns:repeat(3,1fr)"></div>`;
+    $('#replay').onclick = () => speak(target.a, this.speakLang());
+    const row = $('#listenRow');
+    options.forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'tile' + (p.a.length > 2 ? ' longword' : '');
+      b.dataset.key = p.a;
+      b.dataset.ok = p.a === target.a ? '1' : '0';
+      b.innerHTML = `${p.a}<small>${p.j || ''}</small>`;
+      b.onclick = () => this.listenPick(b);
+      row.appendChild(b);
+    });
+    setTimeout(() => speak(target.a, this.speakLang()), 350);
+  },
+
+  listenPick(el) {
+    if (this.busy) return;
+    if (el.dataset.ok === '1') {
+      this.busy = true;
+      el.classList.add('matched');
+      speak(this.target.a, this.speakLang());
+      this.roundWon();
+    } else {
+      this.misses++;
+      el.classList.add('wrong');
+      setTimeout(() => el.classList.remove('wrong'), 450);
+      if (this.misses >= 2) {
+        const right = $('#listenRow .tile[data-ok="1"]');
+        right.classList.add('hint');
+        toast(`係「${this.target.a}」呀！Listen: ${this.target.e}`);
+        speak(this.target.a, this.speakLang());
+      } else {
+        const nd = pickFrom(NUDGE);
+        toast(nd.zh + ' 再聽多次 🔊');
+        speak(this.target.a, this.speakLang());
+      }
+    }
+  },
+
+  /* ================= TALK TIME ================= */
+  buildTalk() {
+    const d = this.st.dialogs[this.round];
+    $('#gprompt').innerHTML = '應該點答呢？Tap the best reply.';
+    $('#gboard').innerHTML = `
+      <div class="talkstage">
+        <div class="npcrow">
+          <span class="npcface">${d.icon}</span>
+          <button class="bubble" id="npcbubble">${d.say}<small>${d.e}</small></button>
+        </div>
+        <div class="replies" id="replies"></div>
+      </div>`;
+    $('#npcbubble').onclick = () => speak(d.say, 'zh');
+    const box = $('#replies');
+    shuffle([...d.opts]).forEach(o => {
+      const b = document.createElement('button');
+      b.className = 'replybtn';
+      b.dataset.ok = o.ok ? '1' : '0';
+      b.textContent = o.t;
+      b.onclick = () => this.talkPick(b, o);
+      box.appendChild(b);
+    });
+    setTimeout(() => speak(d.say, 'zh'), 350);
+  },
+
+  talkPick(el, opt) {
+    if (this.busy) return;
+    speak(opt.t, 'zh');
+    if (opt.ok) {
+      this.busy = true;
+      el.classList.add('goodreply');
+      this.roundWon(1100);
+    } else {
+      this.misses++;
+      el.classList.add('wrong');
+      setTimeout(() => el.classList.remove('wrong'), 450);
+      if (this.misses >= 2) $('#replies .replybtn[data-ok="1"]').classList.add('hint');
+      toast('諗吓先⋯ Hmm, try the other one!');
+    }
+  },
+
+  /* ================= CHARACTER FACTORY ================= */
+  buildFactory() {
+    const b = this.st.builds[this.round];
+    this.factorySlots = new Array(b.parts.length).fill(null);
+    /* parts pool = needed parts + one distractor from the other builds */
+    const others = this.st.builds.filter(x => x !== b).flatMap(x => x.parts)
+      .filter(p => !b.parts.includes(p));
+    const pool = shuffle([...b.parts, ...(others.length ? [pickFrom(others)] : [])]);
+    $('#gprompt').innerHTML = `啲字可以砌埋一齊㗎！砌個「${b.e}」字 ${b.pic}<br>Build the character that means “${b.e}”.`;
+    $('#gboard').innerHTML = `
+      <div class="factory">
+        <div class="fslots" id="fslots">
+          ${this.factorySlots.map((_, i) => `<button class="fslot" data-i="${i}"></button>`).join('')}
+          <span class="farrow">→</span>
+          <div class="fresult" id="fresult">?</div>
+        </div>
+        <div class="fparts" id="fparts">
+          ${pool.map((p, i) => `<button class="tile fpart" data-part="${p}" data-i="${i}">${p}</button>`).join('')}
+        </div>
+      </div>`;
+    $$('#fparts .fpart').forEach(t => t.onclick = () => this.factoryAdd(t, b));
+    $$('#fslots .fslot').forEach(s => s.onclick = () => this.factoryRemove(s));
+  },
+
+  factoryAdd(tile, build) {
+    if (this.busy || tile.classList.contains('used')) return;
+    const i = this.factorySlots.indexOf(null);
+    if (i === -1) return;
+    speak(tile.dataset.part, 'zh');
+    this.factorySlots[i] = { part: tile.dataset.part, tile };
+    tile.classList.add('used');
+    const slot = $(`#fslots .fslot[data-i="${i}"]`);
+    slot.textContent = tile.dataset.part;
+    slot.classList.add('filled');
+    if (!this.factorySlots.includes(null)) this.factoryCheck(build);
+  },
+
+  factoryRemove(slot) {
+    if (this.busy) return;
+    const i = +slot.dataset.i;
+    const cur = this.factorySlots[i];
+    if (!cur) return;
+    cur.tile.classList.remove('used');
+    this.factorySlots[i] = null;
+    slot.textContent = '';
+    slot.classList.remove('filled');
+  },
+
+  factoryCheck(build) {
+    const got = this.factorySlots.map(s => s.part).sort().join('');
+    const want = [...build.parts].sort().join('');
+    if (got === want) {
+      this.busy = true;
+      const res = $('#fresult');
+      res.textContent = build.result;
+      res.classList.add('made');
+      speak(build.result, 'zh');
+      toast(`${build.parts.join(' + ')} = ${build.result}（${build.e}）${build.pic}`);
+      this.roundWon(1500);
+    } else {
+      this.misses++;
+      $('#fslots').classList.add('wrong');
+      toast(this.misses >= 2 ? `要用：${build.parts.join(' + ')} 呀！` : pickFrom(NUDGE).zh + ' ' + pickFrom(NUDGE).en);
+      setTimeout(() => {
+        $('#fslots').classList.remove('wrong');
+        $$('#fslots .fslot').forEach(s => this.factoryRemove(s));
+      }, 600);
+    }
+  },
+
+  /* ================= MEMORY FLIP ================= */
+  buildMemory() {
+    this.memFirst = null;
+    this.memLock = false;
+    this.matched = 0;
+    const pairs = this.st.pairs;
+    const cards = shuffle(pairs.flatMap(p => [
+      { key: p.a, face: p.a, small: p.j || '' },
+      { key: p.a, face: p.b, small: p.e || '' },
+    ]));
+    $('#gprompt').innerHTML = '翻兩張卡，搵返一對！<br>Flip two cards to find a pair.';
+    const cols = cards.length > 6 ? 4 : 3;
+    $('#gboard').innerHTML = `<div class="memgrid" style="grid-template-columns:repeat(${cols},1fr)">
+      ${cards.map((c, i) => `
+        <button class="mcard" data-key="${c.key}" data-i="${i}">
+          <span class="mback">🚇</span>
+          <span class="mface">${c.face}<small>${c.small}</small></span>
+        </button>`).join('')}
+    </div>`;
+    $$('.mcard').forEach(c => c.onclick = () => this.memFlip(c));
+  },
+
+  memFlip(card) {
+    if (this.memLock || card.classList.contains('open') || card.classList.contains('matchedcard')) return;
+    card.classList.add('open');
+    if (/[一-鿿]/.test(card.querySelector('.mface').textContent)) {
+      speak(card.dataset.key, 'zh');
+    }
+    if (!this.memFirst) { this.memFirst = card; return; }
+    const a = this.memFirst, b = card;
+    this.memFirst = null;
+    if (a.dataset.key === b.dataset.key) {
+      a.classList.add('matchedcard');
+      b.classList.add('matchedcard');
+      this.matched++;
+      if (this.matched === this.st.pairs.length) {
+        setTimeout(() => this.finishStation(), 600);
+      }
+    } else {
+      this.memLock = true;
+      setTimeout(() => {
+        a.classList.remove('open');
+        b.classList.remove('open');
+        this.memLock = false;
+      }, 900);
+    }
+  },
+
+  /* ================= SENTENCE TRAIN ================= */
+  buildSentence() {
+    const s = this.st.sentences[this.round];
+    this.target = s;
+    this.factorySlots = new Array(s.words.length).fill(null);
+    const otherWords = this.st.sentences.filter(x => x !== s).flatMap(x => x.words)
+      .filter(w => !s.words.includes(w));
+    const tray = shuffle([...s.words, ...(otherWords.length ? [pickFrom(otherWords)] : [])]);
+    $('#gprompt').innerHTML = `${s.pic}<br>砌返句句子啦！Build the sentence: <i>${s.e}</i>`;
+    $('#gboard').innerHTML = `
+      <div class="sentence">
+        <div class="strain" id="strain">
+          <span class="sloco">🚂</span>
+          ${this.factorySlots.map((_, i) => `<button class="sslot" data-i="${i}"></button>`).join('')}
+        </div>
+        <div class="stray" id="stray">
+          ${tray.map((w, i) => `<button class="tile sword" data-word="${w}" data-i="${i}">${w}</button>`).join('')}
+        </div>
+      </div>`;
+    $$('#stray .sword').forEach(t => t.onclick = () => this.sentenceAdd(t, s));
+    $$('#strain .sslot').forEach(sl => sl.onclick = () => this.sentenceRemove(sl));
+  },
+
+  sentenceAdd(tile, s) {
+    if (this.busy || tile.classList.contains('used')) return;
+    const i = this.factorySlots.indexOf(null);
+    if (i === -1) return;
+    speak(tile.dataset.word, 'zh');
+    this.factorySlots[i] = { part: tile.dataset.word, tile };
+    tile.classList.add('used');
+    const slot = $(`#strain .sslot[data-i="${i}"]`);
+    slot.textContent = tile.dataset.word;
+    slot.classList.add('filled');
+    if (!this.factorySlots.includes(null)) this.sentenceCheck(s);
+  },
+
+  sentenceRemove(slot) {
+    if (this.busy) return;
+    const i = +slot.dataset.i;
+    const cur = this.factorySlots[i];
+    if (!cur) return;
+    cur.tile.classList.remove('used');
+    this.factorySlots[i] = null;
+    slot.textContent = '';
+    slot.classList.remove('filled');
+  },
+
+  sentenceCheck(s) {
+    const got = this.factorySlots.map(x => x.part).join('');
+    if (got === s.words.join('')) {
+      this.busy = true;
+      $('#strain').classList.add('depart');
+      speak(s.words.join(''), 'zh');
+      toast('🚂 ' + s.words.join('') + '！');
+      this.roundWon(1400);
+    } else {
+      this.misses++;
+      $('#strain').classList.add('wrong');
+      if (this.misses >= 2) {
+        /* Teach, don't fail: show the right order, say it, move on. */
+        this.busy = true;
+        setTimeout(() => {
+          $$('#strain .sslot').forEach((sl, i) => {
+            sl.textContent = s.words[i];
+            sl.classList.add('filled', 'hint');
+          });
+          speak(s.words.join(''), 'zh');
+          toast('一齊讀：' + s.words.join('') + '！');
+          this.roundWon(1800);
+        }, 650);
+      } else {
+        toast(pickFrom(NUDGE).zh + ' 聽吓個句子先 🔊');
+        speak(s.words.join(''), 'zh');
+        setTimeout(() => {
+          $('#strain').classList.remove('wrong');
+          $$('#strain .sslot').forEach(sl => this.sentenceRemove(sl));
+        }, 650);
+      }
+    }
+  },
+
+  /* ================= COUNT / ONE-MORE ================= */
   buildCount() {
     const st = this.st;
     const onemore = st.mode === 'onemore';
     const min = st.min || 1;
     const max = onemore ? st.max - 1 : st.max;
-    this.target = min + Math.floor(Math.random() * (max - min + 1));
+    this.target = randInt(min, max);
     const answer = onemore ? this.target + 1 : this.target;
     $('#gprompt').innerHTML = onemore
       ? `呢度有 ${this.target} 個 — 多<b>一個</b>係幾多？<br>One MORE than ${this.target} is…?`
@@ -417,12 +766,11 @@ const Game = {
     this.buildAnswers(answer, st.max + (onemore ? 1 : 0));
   },
 
-  /* ---------- ADD ---------- */
+  /* ================= ADD ================= */
   buildAdd() {
     const max = this.st.max;
-    const a = 1 + Math.floor(Math.random() * (max - 2));
-    const b = 1 + Math.floor(Math.random() * (max - a - 0.01));
-    this.addends = [a, b];
+    const a = randInt(1, max - 2);
+    const b = randInt(1, max - a - 1) || 1;
     this.target = a + b;
     $('#gprompt').innerHTML = `${a} 加 ${b} 係幾多？<br>What is ${a} + ${b}?`;
     $('#gboard').innerHTML = `
@@ -437,6 +785,161 @@ const Game = {
     this.buildAnswers(this.target, max);
   },
 
+  /* ================= QUICK PEEK (subitising) ================= */
+  buildPeek() {
+    this.target = randInt(this.st.min, this.st.max);
+    $('#gprompt').innerHTML = '快啲睇！有幾多個？<br>Quick peek — how many?';
+    $('#gboard').innerHTML = `
+      <div class="blockstage" id="peekstage"><div class="tower" id="tower"></div>
+        <div class="peekcover" id="peekcover">🎁</div></div>
+      <div class="answers" id="answers"></div>`;
+    this.buildTower($('#tower'), this.target);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(() => {
+      $('#peekcover').classList.add('down');
+      this.buildAnswers(this.target, this.st.max);
+    }, reduced ? 3200 : 1700);
+  },
+
+  /* ================= TAKE AWAY / ZERO ================= */
+  buildTakeaway() {
+    const max = this.st.max;
+    const n = randInt(2, max);
+    const k = this.st.allowZero ? (Math.random() < 0.4 ? n : randInt(1, n)) : randInt(1, n - 1);
+    this.target = n - k;
+    $('#gprompt').innerHTML = `${n} 減 ${k} 剩返幾多？<br>${n} take away ${k} — how many left?`;
+    $('#gboard').innerHTML = `
+      <div class="blockstage"><div class="tower" id="tower"></div></div>
+      <div class="answers" id="answers"></div>`;
+    this.buildTower($('#tower'), n);
+    setTimeout(() => {
+      const blocks = $$('#tower .block');
+      for (let i = 0; i < k; i++) {
+        const bl = blocks[blocks.length - 1 - i];
+        bl.classList.add('hop');
+        bl.style.animationDelay = (i * 0.22) + 's';
+      }
+      setTimeout(() => this.buildAnswers(this.target, max, this.st.allowZero), k * 220 + 500);
+    }, 800);
+  },
+
+  /* ================= BOND BRIDGE ================= */
+  buildBond() {
+    const N = randInt(3, this.st.max);
+    const a = randInt(1, N - 1);
+    this.target = N - a;
+    $('#gprompt').innerHTML = `${N} 可以拆開 ${a} 同幾多？<br>${N} = ${a} + ?`;
+    $('#gboard').innerHTML = `
+      <div class="blockstage add">
+        <div class="tower" id="towerA"></div>
+        <div class="plus">+</div>
+        <div class="mystery">?</div>
+      </div>
+      <div class="answers" id="answers"></div>`;
+    this.buildTower($('#towerA'), a);
+    this.buildAnswers(this.target, this.st.max);
+  },
+
+  /* ================= TWINS (doubles) ================= */
+  buildDouble() {
+    const a = randInt(1, this.st.max);
+    this.target = a * 2;
+    $('#gprompt').innerHTML = `孖孖魔法！${a} 加 ${a} 係幾多？<br>Double ${a} is…?`;
+    $('#gboard').innerHTML = `
+      <div class="blockstage add">
+        <div class="tower" id="towerA"></div>
+        <div class="plus">+</div>
+        <div class="tower ghost" id="towerB"></div>
+      </div>
+      <div class="answers" id="answers"></div>`;
+    this.buildTower($('#towerA'), a);
+    this.buildTower($('#towerB'), a);
+    this.buildAnswers(this.target, this.st.max * 2);
+  },
+
+  /* ================= ODD OR EVEN ================= */
+  buildOddEven() {
+    const n = randInt(2, this.st.max);
+    this.target = n % 2 === 0 ? 'even' : 'odd';
+    $('#gprompt').innerHTML = `${n} 個方塊，兩個兩個孖住企 — 有冇一個冇得孖？<br>Is ${n} odd or even?`;
+    const col = BLOCK_COLORS[(n - 1) % BLOCK_COLORS.length];
+    let html = '<div class="pairtower">';
+    for (let r = Math.ceil(n / 2) - 1; r >= 0; r--) {
+      const inRow = Math.min(2, n - r * 2);
+      html += `<div class="pairrow">${
+        Array.from({ length: inRow }, (_, c) =>
+          `<div class="block pb ${inRow === 1 ? 'lonely' : ''}" style="background:${col}"></div>`).join('')
+      }</div>`;
+    }
+    html += '</div>';
+    $('#gboard').innerHTML = `
+      <div class="blockstage">${html}</div>
+      <div class="answers oe" id="answers">
+        <button class="btn" data-v="even" style="background:var(--green);box-shadow:0 5px 0 color-mix(in oklab, var(--green) 65%, black)">雙數 even 👯</button>
+        <button class="btn red" data-v="odd">單數 odd ☝️</button>
+      </div>`;
+    $$('#answers .btn').forEach(b => b.onclick = () => {
+      if (this.busy) return;
+      if (b.dataset.v === this.target) {
+        this.busy = true;
+        toast(`啱晒！${n} 係${this.target === 'even' ? '雙' : '單'}數 ✓`);
+        this.roundWon();
+      } else {
+        this.misses++;
+        b.classList.add('wrong');
+        setTimeout(() => b.classList.remove('wrong'), 450);
+        toast(this.misses >= 2
+          ? (this.target === 'odd' ? '睇吓最頂嗰個，冇得孖呀！☝️' : '個個都有得孖呀！👯')
+          : pickFrom(NUDGE).zh + ' 睇吓啲方塊孖唔孖到！');
+      }
+    });
+  },
+
+  /* ================= FIVE AND A BIT ================= */
+  buildFivebit() {
+    const n = randInt(6, 10);
+    this.target = n - 5;
+    $('#gprompt').innerHTML = `${n} 係「5 加一啲」— 嗰啲係幾多？<br>${n} is five and a bit — how big is the bit?`;
+    $('#gboard').innerHTML = `
+      <div class="blockstage"><div class="tower" id="tower"></div></div>
+      <div class="answers" id="answers"></div>`;
+    const tower = $('#tower');
+    for (let i = 0; i < n; i++) {
+      const d = document.createElement('div');
+      d.className = 'block';
+      d.style.background = i < 5 ? 'var(--blue)' : '#F58A2E';
+      d.style.animationDelay = (i * 0.06) + 's';
+      if (i === n - 1) d.innerHTML =
+        '<div class="facebits"><span class="eyes"><i></i><i></i></span><span class="smile"></span></div>';
+      tower.appendChild(d);
+    }
+    this.buildAnswers(this.target, 5);
+  },
+
+  /* ================= MAKE TEN ================= */
+  buildMaketen() {
+    const a = randInt(1, 9);
+    this.target = 10 - a;
+    $('#gprompt').innerHTML = `${a} 加幾多先變成 10？<br>${a} and who make ten?`;
+    $('#gboard').innerHTML = `
+      <div class="blockstage"><div class="tower" id="tower"></div></div>
+      <div class="answers" id="answers"></div>`;
+    const tower = $('#tower');
+    for (let i = 0; i < 10; i++) {
+      const d = document.createElement('div');
+      d.className = 'block' + (i >= a ? ' slotblock' : '');
+      if (i < a) {
+        d.style.background = BLOCK_COLORS[(a - 1) % BLOCK_COLORS.length];
+        d.style.animationDelay = (i * 0.05) + 's';
+      }
+      if (i === a - 1) d.innerHTML =
+        '<div class="facebits"><span class="eyes"><i></i><i></i></span><span class="smile"></span></div>';
+      tower.appendChild(d);
+    }
+    this.buildAnswers(this.target, 9);
+  },
+
+  /* ================= shared tower / answers / guess ================= */
   buildTower(el, n) {
     el.innerHTML = '';
     const col = BLOCK_COLORS[(n - 1) % BLOCK_COLORS.length];
@@ -451,11 +954,12 @@ const Game = {
     }
   },
 
-  buildAnswers(answer, cap) {
+  buildAnswers(answer, cap, allowZero = false) {
+    const floor = allowZero ? 0 : 1;
     const opts = new Set([answer]);
     while (opts.size < 3) {
-      const d = answer + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2));
-      if (d >= 1 && d <= Math.max(cap, answer + 2)) opts.add(d);
+      const d = answer + (Math.random() < 0.5 ? -1 : 1) * randInt(1, 2);
+      if (d >= floor && d <= Math.max(cap, answer + 2)) opts.add(d);
     }
     const ans = $('#answers');
     ans.innerHTML = '';
@@ -470,23 +974,20 @@ const Game = {
   },
 
   guess(n, answer, btn) {
+    if (this.busy) return;
     if (n === answer) {
+      this.busy = true;
       speak(String(answer), 'zh');
-      this.round++;
-      if (this.rounds > 1) this.pips();
-      if (this.round >= this.rounds) {
-        setTimeout(() => this.finishStation(), 400);
-      } else {
-        toast(`啱晒！${answer} ✓`);
-        setTimeout(() => this.nextRound(), 750);
-      }
+      if (answer === 0) toast('冇晒喇！Zero! 0️⃣');
+      else toast(`啱晒！${answer} ✓`);
+      this.roundWon();
     } else {
       this.misses++;
       btn.classList.add('wrongpick');
       if (this.misses >= 2) {
         toast('一齊數吓：1、2、3⋯ Count together!');
-        /* Bounce blocks one by one as a counting scaffold. */
-        $$('#gboard .block').forEach((bl, i) => {
+        $('#peekcover') && $('#peekcover').classList.add('down');
+        $$('#gboard .block:not(.slotblock)').forEach((bl, i) => {
           bl.style.animation = 'none';
           void bl.offsetWidth;
           bl.style.animation = `drop .3s ease ${i * 0.25}s backwards`;

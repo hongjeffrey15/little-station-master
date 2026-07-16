@@ -208,6 +208,107 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
   font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:30;white-space:nowrap;max-width:92%}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ---------- theme headers on the line map ---------- */
+.themehead{margin:14px 0 4px 62px;font-size:12.5px;font-weight:800;color:var(--muted);
+  letter-spacing:.06em;display:flex;align-items:center;gap:6px}
+
+/* ---------- listen & find ---------- */
+.listenhub{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 14px}
+.speakerbtn{width:86px;height:86px;border-radius:50%;font-size:38px;background:var(--card);
+  border:2.5px solid var(--line);box-shadow:0 5px 0 var(--line);transition:transform .08s}
+.speakerbtn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+
+/* ---------- talk time ---------- */
+.talkstage{display:flex;flex-direction:column;gap:20px;padding:8px 2px}
+.npcrow{display:flex;align-items:flex-start;gap:10px}
+.npcface{font-size:44px;line-height:1;flex:none}
+.bubble{background:var(--card);border:2px solid var(--line);border-radius:4px 22px 22px 22px;
+  padding:14px 16px;font-size:19px;font-weight:800;text-align:left;display:flex;
+  flex-direction:column;gap:4px;box-shadow:0 4px 0 var(--line)}
+.bubble small{font-size:12px;color:var(--muted);font-weight:600}
+.replies{display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.replybtn{background:color-mix(in oklab, var(--blue) 12%, var(--card));border:2px solid var(--blue);
+  border-radius:22px 4px 22px 22px;padding:13px 16px;font-size:17px;font-weight:800;
+  max-width:85%;text-align:left;box-shadow:0 4px 0 color-mix(in oklab, var(--blue) 40%, var(--line));
+  transition:transform .08s}
+.replybtn:active{transform:translateY(3px)}
+.replybtn.goodreply{background:color-mix(in oklab, var(--good) 16%, var(--card));border-color:var(--good);
+  box-shadow:0 4px 0 color-mix(in oklab, var(--good) 45%, var(--line));animation:pop .35s ease}
+.replybtn.wrong{animation:wiggle .4s ease}
+.replybtn.hint{border-color:var(--sun);box-shadow:0 0 0 4px color-mix(in oklab, var(--sun) 45%, transparent)}
+
+/* ---------- character factory ---------- */
+.factory{display:flex;flex-direction:column;gap:22px;padding:8px 0}
+.fslots{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.fslots.wrong{animation:wiggle .4s ease}
+.fslot{width:64px;height:64px;border-radius:16px;border:2.5px dashed var(--muted);background:transparent;
+  font-size:32px;font-weight:800;display:grid;place-items:center}
+.fslot.filled{border-style:solid;border-color:var(--blue);background:var(--card);box-shadow:0 3px 0 var(--line)}
+.farrow{font-size:24px;font-weight:800;color:var(--muted)}
+.fresult{width:80px;height:80px;border-radius:20px;border:3px solid var(--sun);background:var(--card);
+  font-size:44px;font-weight:800;display:grid;place-items:center;color:var(--muted)}
+.fresult.made{color:var(--ink);animation:pop .5s ease;border-color:var(--good);
+  box-shadow:0 0 0 6px color-mix(in oklab, var(--good) 25%, transparent)}
+.fparts{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.fpart{width:74px;min-height:74px;aspect-ratio:1;font-size:34px}
+.fpart.used{opacity:.25;pointer-events:none}
+
+/* ---------- memory flip ---------- */
+.memgrid{display:grid;gap:10px}
+.mcard{aspect-ratio:1;border-radius:18px;position:relative;border:2.5px solid var(--line);
+  background:var(--card);box-shadow:0 4px 0 var(--line);overflow:hidden;transition:transform .1s}
+.mcard:active{transform:scale(.96)}
+.mcard .mback,.mcard .mface{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;transition:opacity .25s, transform .25s}
+.mcard .mback{font-size:30px;background:color-mix(in oklab, var(--blue) 10%, var(--card))}
+.mcard .mface{font-size:30px;font-weight:800;opacity:0;transform:scale(.6)}
+.mcard .mface small{font-size:10px;color:var(--muted);font-weight:700}
+.mcard.open .mback{opacity:0}
+.mcard.open .mface{opacity:1;transform:scale(1)}
+.mcard.matchedcard{border-color:var(--good);background:color-mix(in oklab, var(--good) 14%, var(--card));
+  box-shadow:0 4px 0 color-mix(in oklab, var(--good) 45%, var(--line));animation:pop .35s ease}
+
+/* ---------- sentence train ---------- */
+.sentence{display:flex;flex-direction:column;gap:24px;padding:8px 0}
+.strain{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.strain.wrong{animation:wiggle .4s ease}
+.strain.depart{animation:depart 1.2s ease .2s forwards}
+@keyframes depart{to{transform:translateX(120%);opacity:0}}
+.sloco{font-size:40px}
+.sslot{min-width:60px;height:60px;padding:0 8px;border-radius:14px;border:2.5px dashed var(--muted);
+  background:transparent;font-size:26px;font-weight:800;display:grid;place-items:center}
+.sslot.filled{border-style:solid;border-color:var(--red);background:var(--card);box-shadow:0 3px 0 var(--line)}
+.sslot.hint{border-color:var(--sun)}
+.stray{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.sword{min-width:70px;width:auto;aspect-ratio:auto;min-height:70px;padding:8px 14px;font-size:28px}
+.sword.used{opacity:.25;pointer-events:none}
+
+/* ---------- quick peek ---------- */
+#peekstage{position:relative}
+.peekcover{position:absolute;inset:0;display:grid;place-items:center;font-size:64px;
+  background:color-mix(in oklab, var(--sun) 18%, var(--app-bg));border-radius:22px;
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.peekcover.down{opacity:1}
+
+/* ---------- take away / bond / twins / make ten ---------- */
+.block.hop{animation:hopoff .55s ease forwards !important}
+@keyframes hopoff{
+  30%{transform:translateY(-26px)}
+  100%{transform:translateY(-10px) translateX(90px) rotate(50deg);opacity:0}
+}
+.mystery{width:64px;height:64px;border-radius:18px;border:3px dashed var(--muted);
+  display:grid;place-items:center;font-size:32px;font-weight:800;color:var(--muted);align-self:center}
+.tower.ghost .block{opacity:.35;border-style:dashed}
+.block.slotblock{background:transparent;border:2.5px dashed var(--muted);animation:none}
+.answers.oe{flex-wrap:wrap}
+.answers.oe .btn.wrong{animation:wiggle .4s ease}
+
+/* ---------- odd / even pair tower ---------- */
+.pairtower{display:flex;flex-direction:column;gap:3px;align-items:center}
+.pairrow{display:flex;gap:3px}
+.block.pb{width:40px;height:34px}
+.block.lonely{box-shadow:0 0 0 4px color-mix(in oklab, var(--sun) 55%, transparent);animation:pulse 1.6s infinite}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
