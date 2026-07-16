@@ -11,6 +11,12 @@ const shuffle = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).
 const pickFrom = a => a[Math.floor(Math.random() * a.length)];
 const randInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
+/* Picture values are emoji by default; 'img:name' renders assets/pics/name.svg
+ * (Mulberry Symbols / photo pack — see ATTRIBUTION.md). */
+const picHTML = b => b && b.startsWith('img:')
+  ? `<img class="picimg" src="assets/pics/${b.slice(4)}.svg" alt="">`
+  : b;
+
 /* ---------- speech (Cantonese / English) ---------- */
 function speak(text, lang) {
   if (!Store.data.settings.audio) return;
@@ -263,7 +269,8 @@ const App = {
         <span class="chip">🚫 無廣告 No ads</span>
         <span class="chip">🚫 無內購 No purchases</span>
         <span class="chip">🔒 唔收集個人資料 No PII</span>
-      </div>`;
+      </div>
+      <p class="sub" style="text-align:center">圖像 Symbols: Mulberry Symbols © Steve Lee (CC BY-SA)</p>`;
   },
 
   copyBackup() {
@@ -417,7 +424,7 @@ const Game = {
       const b = document.createElement('button');
       b.className = 'tile pic';
       b.dataset.key = p.a;
-      b.innerHTML = `<span class="picbody">${p.b}</span><small>${p.e || ''}</small>`;
+      b.innerHTML = `<span class="picbody">${picHTML(p.b)}</span><small>${p.e || ''}</small>`;
       b.onclick = () => this.pick(b, 'pic');
       pr.appendChild(b);
     });
@@ -633,7 +640,7 @@ const Game = {
     const pairs = this.st.pairs;
     const cards = shuffle(pairs.flatMap(p => [
       { key: p.a, face: p.a, small: p.j || '' },
-      { key: p.a, face: p.b, small: p.e || '' },
+      { key: p.a, face: picHTML(p.b), small: p.e || '' },
     ]));
     $('#gprompt').innerHTML = '翻兩張卡，搵返一對！<br>Flip two cards to find a pair.';
     const cols = cards.length > 6 ? 4 : 3;

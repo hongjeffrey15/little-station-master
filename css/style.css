@@ -124,6 +124,8 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
   transition:transform .1s ease, border-color .15s, background .15s}
 .tile.longword{font-size:22px}
 .tile .picbody{font-size:36px;line-height:1.15}
+.picimg{width:56px;height:56px;object-fit:contain;display:block;margin:0 auto}
+.mcard .picimg{width:44px;height:44px}
 .tile .picbody br{line-height:1}
 .tile small{font-size:11px;color:var(--muted);font-weight:700}
 .tile.sel{border-color:var(--blue);transform:translateY(-3px)}

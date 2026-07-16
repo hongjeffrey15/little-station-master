@@ -81,23 +81,23 @@ const LINES = [
       /* —— 我的一天 daily life —— */
       { id: 'c1', theme: '我的一天', name: '早晨站', en: 'Good Morning', icon: '日', type: 'match', lang: 'zh',
         pairs: [
-          { a: '日', b: '☀️', j: 'jat6',  e: 'sun' },
-          { a: '月', b: '🌙', j: 'jyut6', e: 'moon' },
+          { a: '日', b: 'img:sun', j: 'jat6',  e: 'sun' },
+          { a: '月', b: 'img:moon', j: 'jyut6', e: 'moon' },
           { a: '人', b: '🚶', j: 'jan4',  e: 'person' },
         ] },
       { id: 'c2', theme: '我的一天', name: '食飯站', en: 'Yum Yum', icon: '食', type: 'match', lang: 'zh',
         pairs: [
-          { a: '食', b: '😋', j: 'sik6',  e: 'eat' },
-          { a: '飯', b: '🍚', j: 'faan6', e: 'rice' },
-          { a: '水', b: '💧', j: 'seoi2', e: 'water' },
-          { a: '茶', b: '🍵', j: 'caa4',  e: 'tea' },
+          { a: '食', b: 'img:eat', j: 'sik6',  e: 'eat' },
+          { a: '飯', b: 'img:rice', j: 'faan6', e: 'rice' },
+          { a: '水', b: 'img:water', j: 'seoi2', e: 'water' },
+          { a: '茶', b: 'img:tea', j: 'caa4',  e: 'tea' },
         ] },
       { id: 'c3', theme: '我的一天', name: '大細站', en: 'Big & Small', icon: '大', type: 'match', lang: 'zh',
         pairs: [
           { a: '大', b: '🐘', j: 'daai6', e: 'big' },
           { a: '小', b: '🐁', j: 'siu2',  e: 'small' },
           { a: '手', b: '✋', j: 'sau2',  e: 'hand' },
-          { a: '口', b: '👄', j: 'hau2',  e: 'mouth' },
+          { a: '口', b: 'img:mouth', j: 'hau2',  e: 'mouth' },
         ] },
 
       /* —— 搭港鐵 MTR ——
@@ -124,22 +124,22 @@ const LINES = [
       /* —— 遊香港 sightseeing —— */
       { id: 'c6', theme: '遊香港', name: '山頂站', en: 'The Peak', icon: '山', type: 'match', lang: 'zh',
         pairs: [
-          { a: '山', b: '⛰️', j: 'saan1',  e: 'mountain' },
-          { a: '上', b: '⬆️', j: 'soeng6', e: 'up' },
-          { a: '下', b: '⬇️', j: 'haa6',   e: 'down' },
+          { a: '山', b: 'img:mountain', j: 'saan1',  e: 'mountain' },
+          { a: '上', b: 'img:up', j: 'soeng6', e: 'up' },
+          { a: '下', b: 'img:down', j: 'haa6',   e: 'down' },
         ] },
       { id: 'c7', theme: '遊香港', name: '天星站', en: 'Star Ferry', icon: '星', type: 'match', lang: 'zh',
         pairs: [
           { a: '天', b: '🌤️', j: 'tin1',  e: 'sky' },
-          { a: '星', b: '⭐', j: 'sing1', e: 'star' },
-          { a: '船', b: '⛴️', j: 'syun4', e: 'boat' },
+          { a: '星', b: 'img:star', j: 'sing1', e: 'star' },
+          { a: '船', b: 'img:boat', j: 'syun4', e: 'boat' },
         ] },
       { id: 'c8', theme: '遊香港', name: '海洋站', en: 'Ocean Park', icon: '海', type: 'match', lang: 'zh',
         pairs: [
           { a: '海', b: '🌊', j: 'hoi2', e: 'sea' },
-          { a: '魚', b: '🐠', j: 'jyu2', e: 'fish' },
-          { a: '花', b: '🌸', j: 'faa1', e: 'flower' },
-          { a: '樹', b: '🌳', j: 'syu6', e: 'tree' },
+          { a: '魚', b: 'img:fish', j: 'jyu2', e: 'fish' },
+          { a: '花', b: 'img:flower', j: 'faa1', e: 'flower' },
+          { a: '樹', b: 'img:tree', j: 'syu6', e: 'tree' },
         ] },
 
       /* —— 屋企 family —— */
@@ -177,10 +177,10 @@ const LINES = [
       { id: 'c12', theme: '飲茶', name: '茶樓站', en: 'Dim Sum', icon: '點', type: 'match', lang: 'zh',
         pairs: [
           { a: '蝦餃', b: '🥟', j: 'haa1 gaau2',  e: 'shrimp dumpling' },
-          { a: '麵',   b: '🍜', j: 'min6',        e: 'noodles' },
+          { a: '麵',   b: 'img:noodles', j: 'min6',        e: 'noodles' },
           { a: '蛋撻', b: '🍮', j: 'daan6 taat1', e: 'egg tart' },
           { a: '奶茶', b: '🧋', j: 'naai5 caa4',  e: 'milk tea' },
-          { a: '粥',   b: '🥣', j: 'zuk1',        e: 'congee' },
+          { a: '粥',   b: 'img:congee', j: 'zuk1',        e: 'congee' },
         ] },
       { id: 'c13', theme: '飲茶', name: '茶樓・聽字', en: 'Dim sum — listen', icon: '👂', type: 'listen', lang: 'zh',
         pool: [
@@ -241,19 +241,19 @@ const LINES = [
       /* —— 身體 body —— */
       { id: 'c19', theme: '身體', name: '身體站', en: 'My Body', icon: '手', type: 'match', lang: 'zh',
         pairs: [
-          { a: '頭', b: '🙂', j: 'tau4',  e: 'head' },
-          { a: '眼', b: '👁️', j: 'ngaan5', e: 'eye' },
-          { a: '耳', b: '👂', j: 'ji5',   e: 'ear' },
-          { a: '口', b: '👄', j: 'hau2',  e: 'mouth' },
+          { a: '頭', b: 'img:head', j: 'tau4',  e: 'head' },
+          { a: '眼', b: 'img:eye', j: 'ngaan5', e: 'eye' },
+          { a: '耳', b: 'img:ear', j: 'ji5',   e: 'ear' },
+          { a: '口', b: 'img:mouth', j: 'hau2',  e: 'mouth' },
           { a: '手', b: '✋', j: 'sau2',  e: 'hand' },
-          { a: '腳', b: '🦶', j: 'goek3', e: 'foot' },
+          { a: '腳', b: 'img:foot', j: 'goek3', e: 'foot' },
         ] },
       { id: 'c20', theme: '身體', name: '身體・翻卡', en: 'Body — memory', icon: '🎴', type: 'memory', lang: 'zh',
         pairs: [
-          { a: '眼', b: '👁️', j: 'ngaan5', e: 'eye' },
-          { a: '耳', b: '👂', j: 'ji5',   e: 'ear' },
+          { a: '眼', b: 'img:eye', j: 'ngaan5', e: 'eye' },
+          { a: '耳', b: 'img:ear', j: 'ji5',   e: 'ear' },
           { a: '手', b: '✋', j: 'sau2',  e: 'hand' },
-          { a: '腳', b: '🦶', j: 'goek3', e: 'foot' },
+          { a: '腳', b: 'img:foot', j: 'goek3', e: 'foot' },
         ] },
 
       /* —— 砌字工場 character factory (compositional awareness) —— */
@@ -287,8 +287,8 @@ const LINES = [
       /* —— 天氣 weather —— */
       { id: 'c25', theme: '天氣', name: '天氣站', en: 'Weather', icon: '雨', type: 'match', lang: 'zh',
         pairs: [
-          { a: '太陽', b: '☀️', j: 'taai3 joeng4', e: 'sun' },
-          { a: '雨',   b: '🌧️', j: 'jyu5',  e: 'rain' },
+          { a: '太陽', b: 'img:sun', j: 'taai3 joeng4', e: 'sun' },
+          { a: '雨',   b: 'img:rain', j: 'jyu5',  e: 'rain' },
           { a: '風',   b: '💨', j: 'fung1', e: 'wind' },
           { a: '熱',   b: '🥵', j: 'jit6',  e: 'hot' },
           { a: '凍',   b: '🥶', j: 'dung3', e: 'cold' },
@@ -306,28 +306,28 @@ const LINES = [
       /* —— 街市 market —— */
       { id: 'c27', theme: '街市', name: '街市站', en: 'Wet Market', icon: '菜', type: 'match', lang: 'zh',
         pairs: [
-          { a: '菜',   b: '🥬', j: 'coi3',  e: 'vegetables' },
-          { a: '魚',   b: '🐟', j: 'jyu2',  e: 'fish' },
-          { a: '蛋',   b: '🥚', j: 'daan2', e: 'egg' },
-          { a: '蘋果', b: '🍎', j: 'ping4 gwo2', e: 'apple' },
-          { a: '橙',   b: '🍊', j: 'caang2', e: 'orange' },
+          { a: '菜',   b: 'img:vegetables', j: 'coi3',  e: 'vegetables' },
+          { a: '魚',   b: 'img:fish', j: 'jyu2',  e: 'fish' },
+          { a: '蛋',   b: 'img:egg', j: 'daan2', e: 'egg' },
+          { a: '蘋果', b: 'img:apple', j: 'ping4 gwo2', e: 'apple' },
+          { a: '橙',   b: 'img:orange', j: 'caang2', e: 'orange' },
         ] },
       { id: 'c28', theme: '街市', name: '街市・翻卡', en: 'Market — memory', icon: '🎴', type: 'memory', lang: 'zh',
         pairs: [
-          { a: '菜',   b: '🥬', j: 'coi3',  e: 'vegetables' },
-          { a: '蛋',   b: '🥚', j: 'daan2', e: 'egg' },
-          { a: '蘋果', b: '🍎', j: 'ping4 gwo2', e: 'apple' },
-          { a: '橙',   b: '🍊', j: 'caang2', e: 'orange' },
+          { a: '菜',   b: 'img:vegetables', j: 'coi3',  e: 'vegetables' },
+          { a: '蛋',   b: 'img:egg', j: 'daan2', e: 'egg' },
+          { a: '蘋果', b: 'img:apple', j: 'ping4 gwo2', e: 'apple' },
+          { a: '橙',   b: 'img:orange', j: 'caang2', e: 'orange' },
         ] },
 
       /* —— 出街 transport —— */
       { id: 'c29', theme: '出街', name: '交通站', en: 'Transport', icon: '車', type: 'match', lang: 'zh',
         pairs: [
-          { a: '巴士', b: '🚌', j: 'baa1 si2',  e: 'bus' },
-          { a: '的士', b: '🚕', j: 'dik1 si2',  e: 'taxi' },
+          { a: '巴士', b: 'img:bus2', j: 'baa1 si2',  e: 'bus' },
+          { a: '的士', b: 'img:taxi', j: 'dik1 si2',  e: 'taxi' },
           { a: '電車', b: '🚋', j: 'din6 ce1',  e: 'tram (ding ding)' },
-          { a: '船',   b: '⛴️', j: 'syun4',     e: 'boat' },
-          { a: '飛機', b: '✈️', j: 'fei1 gei1', e: 'plane' },
+          { a: '船',   b: 'img:ferry', j: 'syun4',     e: 'boat' },
+          { a: '飛機', b: 'img:plane', j: 'fei1 gei1', e: 'plane' },
         ] },
       { id: 'c30', theme: '出街', name: '交通・聽字', en: 'Transport — listen', icon: '👂', type: 'listen', lang: 'zh',
         pool: [
@@ -341,7 +341,7 @@ const LINES = [
       /* —— 節日 festivals —— */
       { id: 'c31', theme: '節日', name: '節日站', en: 'Festivals', icon: '🧧', type: 'match', lang: 'zh',
         pairs: [
-          { a: '新年', b: '🎆', j: 'san1 nin4',    e: 'New Year' },
+          { a: '新年', b: 'img:fireworks', j: 'san1 nin4',    e: 'New Year' },
           { a: '利是', b: '🧧', j: 'lai6 si6',     e: 'red packet' },
           { a: '月餅', b: '🥮', j: 'jyut6 beng2',  e: 'mooncake' },
           { a: '燈籠', b: '🏮', j: 'dang1 lung4',  e: 'lantern' },
@@ -366,27 +366,27 @@ const LINES = [
     stations: [
       { id: 'e1', theme: 'Phonics', name: 's · a · t', en: 'Letter sounds', icon: 's', type: 'match', lang: 'en',
         pairs: [
-          { a: 's', b: '🐍', e: 'snake' },
-          { a: 'a', b: '🍎', e: 'apple' },
-          { a: 't', b: '🐯', e: 'tiger' },
+          { a: 's', b: 'img:snake', e: 'snake' },
+          { a: 'a', b: 'img:apple', e: 'apple' },
+          { a: 't', b: 'img:tiger', e: 'tiger' },
         ] },
       { id: 'e2', theme: 'Phonics', name: 'p · i · n', en: 'Letter sounds', icon: 'p', type: 'match', lang: 'en',
         pairs: [
-          { a: 'p', b: '🐷', e: 'pig' },
+          { a: 'p', b: 'img:pig', e: 'pig' },
           { a: 'i', b: '🐛', e: 'insect' },
           { a: 'n', b: '👃', e: 'nose' },
         ] },
       { id: 'e3', theme: 'Words', name: 'First words', en: 'cat · sun · bus', icon: 'c', type: 'match', lang: 'en',
         pairs: [
-          { a: 'cat', b: '🐱', e: 'cat' },
-          { a: 'sun', b: '☀️', e: 'sun' },
-          { a: 'bus', b: '🚌', e: 'bus' },
+          { a: 'cat', b: 'img:cat', e: 'cat' },
+          { a: 'sun', b: 'img:sun', e: 'sun' },
+          { a: 'bus', b: 'img:bus2', e: 'bus' },
         ] },
       { id: 'e4', theme: 'Words', name: 'More words', en: 'dog · egg · hat', icon: 'd', type: 'match', lang: 'en',
         pairs: [
-          { a: 'dog', b: '🐶', e: 'dog' },
-          { a: 'egg', b: '🥚', e: 'egg' },
-          { a: 'hat', b: '🎩', e: 'hat' },
+          { a: 'dog', b: 'img:dog', e: 'dog' },
+          { a: 'egg', b: 'img:egg', e: 'egg' },
+          { a: 'hat', b: 'img:hat', e: 'hat' },
         ] },
       { id: 'e5', theme: 'Words', name: 'Colours', en: 'red · blue · green', icon: '🎨', type: 'match', lang: 'en',
         pairs: [
@@ -397,21 +397,21 @@ const LINES = [
         ] },
       { id: 'e6', theme: 'Words', name: 'Animals', en: 'fish · bird · horse', icon: '🐟', type: 'match', lang: 'en',
         pairs: [
-          { a: 'fish',  b: '🐟', e: 'fish' },
-          { a: 'bird',  b: '🐦', e: 'bird' },
-          { a: 'horse', b: '🐴', e: 'horse' },
+          { a: 'fish',  b: 'img:fish', e: 'fish' },
+          { a: 'bird',  b: 'img:bird', e: 'bird' },
+          { a: 'horse', b: 'img:horse', e: 'horse' },
         ] },
       { id: 'e7', theme: 'HK Bridge', name: 'HK Bridge 一', en: 'Two languages, one word', icon: '⛰️', type: 'match', lang: 'en',
         pairs: [
-          { a: 'mountain', sub: '山', b: '⛰️', e: 'mountain' },
-          { a: 'star',     sub: '星', b: '⭐', e: 'star' },
+          { a: 'mountain', sub: '山', b: 'img:mountain', e: 'mountain' },
+          { a: 'star',     sub: '星', b: 'img:star', e: 'star' },
           { a: 'sea',      sub: '海', b: '🌊', e: 'sea' },
         ] },
       { id: 'e8', theme: 'HK Bridge', name: 'HK Bridge 二', en: 'Two languages, one word', icon: '⛴️', type: 'match', lang: 'en',
         pairs: [
-          { a: 'water', sub: '水', b: '💧', e: 'water' },
-          { a: 'boat',  sub: '船', b: '⛴️', e: 'boat' },
-          { a: 'moon',  sub: '月', b: '🌙', e: 'moon' },
+          { a: 'water', sub: '水', b: 'img:water', e: 'water' },
+          { a: 'boat',  sub: '船', b: 'img:boat', e: 'boat' },
+          { a: 'moon',  sub: '月', b: 'img:moon', e: 'moon' },
         ] },
     ],
   },
