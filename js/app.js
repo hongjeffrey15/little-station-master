@@ -463,7 +463,8 @@ const Game = {
     this.lastKey = target.a;
     this.target = target;
     const options = shuffle([target, ...shuffle(pool.filter(p => p.a !== target.a)).slice(0, 2)]);
-    $('#gprompt').innerHTML = '你聽到邊個字？撳個喇叭再聽多次。<br>Tap the word you hear.';
+    $('#gprompt').innerHTML = this.st.prompt
+      || '你聽到邊個字？撳個喇叭再聽多次。<br>Tap the word you hear.';
     $('#gboard').innerHTML = `
       <div class="listenhub">
         <button class="speakerbtn" id="replay">🔊</button>
@@ -490,7 +491,12 @@ const Game = {
       this.busy = true;
       el.classList.add('matched');
       speak(this.target.a, this.speakLang());
-      this.roundWon();
+      if (this.target.fact) {
+        toast(this.target.fact);
+        this.roundWon(1600);
+      } else {
+        this.roundWon();
+      }
     } else {
       this.misses++;
       el.classList.add('wrong');

@@ -52,10 +52,10 @@ already support them (see `js/data.js`).
 | Theme | Stations | Characters / words |
 |---|---|---|
 | B1 我的一天 Daily routine | c1 早晨站 · c2 食飯站 · c3 大細站 | 日 月 人 食 飯 水 茶 大 小 手 口 |
-| B2 搭港鐵 MTR | c4 中環站 · c5 搭港鐵站 | 中環 · 山頂 · 迪士尼 · 旺角 · 沙田 · 東涌 |
+| B2 搭港鐵 MTR | c4 · c5 (listen: hear the announcement, sight-read the name) | 中環 · 山頂 · 迪士尼 · 旺角 · 沙田 · 東涌 · 香港 — landmark trivia appears as a reward toast, never as the matching key |
 | B3 遊香港 Sightseeing | c6 山頂站 · c7 天星站 · c8 海洋站 | 山 上 下 天 星 船 海 魚 花 樹 |
-| B4 屋企 Family | c9 match · c10 listen · c11 talk | 爸爸 媽媽 哥哥 姐姐 妹妹 我 + 早晨/多謝/唔使客氣 dialogues |
-| B5 飲茶 Dim sum | c12 match · c13 listen · c14 talk | 蝦餃 燒賣 蛋撻 奶茶 粥 飲 食 + ordering dialogues |
+| B4 屋企 Family | c9 match · c10 listen · c11 talk | 爸爸 媽媽 爺爺 嫲嫲 哥哥 姐姐 (+ 妹妹 我 in listening) + 早晨/多謝/唔使客氣 dialogues |
+| B5 飲茶 Dim sum | c12 match · c13 listen · c14 talk | 蝦餃 麵 蛋撻 奶茶 粥 (+ 燒賣 飲 食 in listening) + ordering dialogues |
 | B6 顏色 Colours | c15 match · c16 memory | 紅 黃 藍 綠 黑 白 |
 | B7 數字 Numbers | c17 match · c18 listen | 一 至 十 — cross-line bridge with the Number Line |
 | B8 身體 Body | c19 match · c20 memory | 頭 眼 耳 口 手 腳 |

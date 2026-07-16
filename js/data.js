@@ -87,7 +87,7 @@ const LINES = [
         ] },
       { id: 'c2', theme: '我的一天', name: '食飯站', en: 'Yum Yum', icon: '食', type: 'match', lang: 'zh',
         pairs: [
-          { a: '食', b: '🍽️', j: 'sik6',  e: 'eat' },
+          { a: '食', b: '😋', j: 'sik6',  e: 'eat' },
           { a: '飯', b: '🍚', j: 'faan6', e: 'rice' },
           { a: '水', b: '💧', j: 'seoi2', e: 'water' },
           { a: '茶', b: '🍵', j: 'caa4',  e: 'tea' },
@@ -100,18 +100,25 @@ const LINES = [
           { a: '口', b: '👄', j: 'hau2',  e: 'mouth' },
         ] },
 
-      /* —— 搭港鐵 MTR —— */
-      { id: 'c4', theme: '搭港鐵', name: '中環站', en: 'Central', icon: '中', type: 'match', lang: 'zh',
-        pairs: [
-          { a: '中環', b: '🏙️', j: 'zung1 waan4', e: 'Central' },
-          { a: '山頂', b: '⛰️', j: 'saan1 deng2', e: 'The Peak' },
-          { a: '迪士尼', b: '🏰', j: 'dik6 si6 nei4', e: 'Disneyland' },
+      /* —— 搭港鐵 MTR ——
+       * Place names are proper nouns — a picture can't "mean" 沙田 to a
+       * five-year-old, so these stations use the listen engine instead:
+       * hear the announcement, sight-read the name. The landmark trivia
+       * lives in `fact`, shown as a fun toast AFTER a correct answer. */
+      { id: 'c4', theme: '搭港鐵', name: '中環站', en: 'Central', icon: '中', type: 'listen', lang: 'zh',
+        prompt: '🚇 港鐵廣播：「下一站係⋯」<br>“Next station is…” — tap its name!',
+        pool: [
+          { a: '中環',   j: 'zung1 waan4',   e: 'Central',    fact: '中環好多高樓大廈！🏙️' },
+          { a: '山頂',   j: 'saan1 deng2',   e: 'The Peak',   fact: '山頂要搭纜車上去！🚡' },
+          { a: '迪士尼', j: 'dik6 si6 nei4', e: 'Disneyland', fact: '迪士尼有座城堡！🏰' },
         ] },
-      { id: 'c5', theme: '搭港鐵', name: '搭港鐵站', en: 'MTR Ride', icon: '鐵', type: 'match', lang: 'zh',
-        pairs: [
-          { a: '旺角', b: '🛍️', j: 'wong6 gok3',  e: 'Mong Kok' },
-          { a: '沙田', b: '🐎', j: 'saa1 tin4',   e: 'Sha Tin' },
-          { a: '東涌', b: '🚠', j: 'dung1 cung1', e: 'Tung Chung' },
+      { id: 'c5', theme: '搭港鐵', name: '搭港鐵站', en: 'MTR Ride', icon: '鐵', type: 'listen', lang: 'zh',
+        prompt: '🚇 港鐵廣播：「下一站係⋯」<br>“Next station is…” — tap its name!',
+        pool: [
+          { a: '旺角', j: 'wong6 gok3',  e: 'Mong Kok',   fact: '旺角好多嘢買、好多嘢食！🛍️' },
+          { a: '沙田', j: 'saa1 tin4',   e: 'Sha Tin',    fact: '沙田有個好大嘅公園！🌳' },
+          { a: '東涌', j: 'dung1 cung1', e: 'Tung Chung', fact: '東涌可以搭纜車去睇大佛！🚠' },
+          { a: '香港', j: 'hoeng1 gong2', e: 'Hong Kong', fact: '香港係我哋嘅家！🏠' },
         ] },
 
       /* —— 遊香港 sightseeing —— */
@@ -123,7 +130,7 @@ const LINES = [
         ] },
       { id: 'c7', theme: '遊香港', name: '天星站', en: 'Star Ferry', icon: '星', type: 'match', lang: 'zh',
         pairs: [
-          { a: '天', b: '🌥️', j: 'tin1',  e: 'sky' },
+          { a: '天', b: '🌤️', j: 'tin1',  e: 'sky' },
           { a: '星', b: '⭐', j: 'sing1', e: 'star' },
           { a: '船', b: '⛴️', j: 'syun4', e: 'boat' },
         ] },
@@ -140,15 +147,17 @@ const LINES = [
         pairs: [
           { a: '爸爸', b: '👨', j: 'baa4 baa1',  e: 'daddy' },
           { a: '媽媽', b: '👩', j: 'maa4 maa1',  e: 'mummy' },
+          { a: '爺爺', b: '👴', j: 'je4 je2',    e: 'grandpa' },
+          { a: '嫲嫲', b: '👵', j: 'maa4 maa4',  e: 'grandma' },
           { a: '哥哥', b: '👦', j: 'go4 go1',    e: 'big brother' },
           { a: '姐姐', b: '👧', j: 'ze4 ze1',    e: 'big sister' },
-          { a: '妹妹', b: '👶', j: 'mui4 mui2',  e: 'little sister' },
-          { a: '我',   b: '🐼', j: 'ngo5',       e: 'me' },
         ] },
       { id: 'c10', theme: '屋企', name: '屋企・聽字', en: 'Family — listen', icon: '👂', type: 'listen', lang: 'zh',
         pool: [
           { a: '爸爸', j: 'baa4 baa1', e: 'daddy' },
           { a: '媽媽', j: 'maa4 maa1', e: 'mummy' },
+          { a: '爺爺', j: 'je4 je2',   e: 'grandpa' },
+          { a: '嫲嫲', j: 'maa4 maa4', e: 'grandma' },
           { a: '哥哥', j: 'go4 go1',   e: 'big brother' },
           { a: '姐姐', j: 'ze4 ze1',   e: 'big sister' },
           { a: '妹妹', j: 'mui4 mui2', e: 'little sister' },
@@ -168,8 +177,8 @@ const LINES = [
       { id: 'c12', theme: '飲茶', name: '茶樓站', en: 'Dim Sum', icon: '點', type: 'match', lang: 'zh',
         pairs: [
           { a: '蝦餃', b: '🥟', j: 'haa1 gaau2',  e: 'shrimp dumpling' },
-          { a: '燒賣', b: '🍢', j: 'siu1 maai2',  e: 'siu mai' },
-          { a: '蛋撻', b: '🥧', j: 'daan6 taat1', e: 'egg tart' },
+          { a: '麵',   b: '🍜', j: 'min6',        e: 'noodles' },
+          { a: '蛋撻', b: '🍮', j: 'daan6 taat1', e: 'egg tart' },
           { a: '奶茶', b: '🧋', j: 'naai5 caa4',  e: 'milk tea' },
           { a: '粥',   b: '🥣', j: 'zuk1',        e: 'congee' },
         ] },
@@ -179,6 +188,7 @@ const LINES = [
           { a: '燒賣', j: 'siu1 maai2',  e: 'siu mai' },
           { a: '蛋撻', j: 'daan6 taat1', e: 'egg tart' },
           { a: '奶茶', j: 'naai5 caa4',  e: 'milk tea' },
+          { a: '麵',   j: 'min6',        e: 'noodles' },
           { a: '飲',   j: 'jam2',        e: 'drink' },
           { a: '食',   j: 'sik6',        e: 'eat' },
         ] },
@@ -231,7 +241,7 @@ const LINES = [
       /* —— 身體 body —— */
       { id: 'c19', theme: '身體', name: '身體站', en: 'My Body', icon: '手', type: 'match', lang: 'zh',
         pairs: [
-          { a: '頭', b: '👤', j: 'tau4',  e: 'head' },
+          { a: '頭', b: '🙂', j: 'tau4',  e: 'head' },
           { a: '眼', b: '👁️', j: 'ngaan5', e: 'eye' },
           { a: '耳', b: '👂', j: 'ji5',   e: 'ear' },
           { a: '口', b: '👄', j: 'hau2',  e: 'mouth' },
@@ -271,7 +281,7 @@ const LINES = [
         sentences: [
           { words: ['我', '去', '山頂'],   pic: '🐼⛰️', e: 'I go to the Peak.' },
           { words: ['爸爸', '飲', '茶'],   pic: '👨🍵', e: 'Daddy drinks tea.' },
-          { words: ['媽媽', '食', '燒賣'], pic: '👩🍢', e: 'Mummy eats siu mai.' },
+          { words: ['媽媽', '食', '麵'], pic: '👩🍜', e: 'Mummy eats noodles.' },
         ] },
 
       /* —— 天氣 weather —— */
