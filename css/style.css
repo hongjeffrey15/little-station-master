@@ -1,0 +1,213 @@
+/* 小站長 Little Station Master — styles.
+ * Palette drawn from MTR line colours on a warm HK-signage ground.
+ * Token-driven light/dark themes ("day ride" / "night harbour").
+ */
+
+:root{
+  --bg:#F6F1E6; --bg-dot:#E8E0CE; --app-bg:#FBF7EE; --card:#FFFFFF;
+  --ink:#28313C; --muted:#6E7A88; --line:#E7DFCD;
+  --blue:#1B6FC0; --red:#E24A3B; --green:#129D58;
+  --sun:#FFC53D; --star:#FFB020; --good:#129D58;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0D1728; --bg-dot:#18263E; --app-bg:#12203A; --card:#1C2C4A;
+    --ink:#F1F5FA; --muted:#9DABC2; --line:#2C3E60;
+    --blue:#4E9CE8; --red:#F0705F; --green:#2FBE77;
+    --sun:#FFCE55; --star:#FFC24A; --good:#2FBE77;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F6F1E6; --bg-dot:#E8E0CE; --app-bg:#FBF7EE; --card:#FFFFFF;
+  --ink:#28313C; --muted:#6E7A88; --line:#E7DFCD;
+  --blue:#1B6FC0; --red:#E24A3B; --green:#129D58;
+  --sun:#FFC53D; --star:#FFB020; --good:#129D58;
+}
+:root[data-theme="dark"]{
+  --bg:#0D1728; --bg-dot:#18263E; --app-bg:#12203A; --card:#1C2C4A;
+  --ink:#F1F5FA; --muted:#9DABC2; --line:#2C3E60;
+  --blue:#4E9CE8; --red:#F0705F; --green:#2FBE77;
+  --sun:#FFCE55; --star:#FFC24A; --good:#2FBE77;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Microsoft JhengHei","PingFang HK",system-ui,sans-serif;
+  background:var(--bg);
+  background-image:radial-gradient(var(--bg-dot) 1.5px, transparent 1.6px);
+  background-size:26px 26px;
+  color:var(--ink);
+  display:flex;justify-content:center;
+}
+
+.app{
+  width:min(480px,100%);min-height:100svh;background:var(--app-bg);
+  display:flex;flex-direction:column;position:relative;
+  box-shadow:0 0 60px rgba(0,0,0,.08);
+}
+
+.screens{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.screen{display:none;flex-direction:column;gap:16px;padding:22px 18px 26px;min-height:100%}
+.screen.active{display:flex}
+h1{font-size:22px;font-weight:800;text-wrap:balance}
+h2{font-size:15px;font-weight:800;letter-spacing:.02em}
+.sub{font-size:13px;color:var(--muted);font-weight:600}
+.inkstrong{color:var(--ink)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:6px 12px;font-weight:800;font-size:14px;white-space:nowrap}
+.row{display:flex;align-items:center;gap:12px}
+.spread{justify-content:space-between}
+button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:18px;
+  padding:14px 20px;font-weight:800;font-size:16px;color:#fff;background:var(--blue);
+  box-shadow:0 5px 0 color-mix(in oklab, var(--blue) 65%, black);
+  transition:transform .08s ease, box-shadow .08s ease}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 color-mix(in oklab, var(--blue) 65%, black)}
+.btn.red{background:var(--red);box-shadow:0 5px 0 color-mix(in oklab, var(--red) 65%, black)}
+.btn.red:active{box-shadow:0 1px 0 color-mix(in oklab, var(--red) 65%, black)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.ghost:active{box-shadow:0 1px 0 var(--line)}
+.back{width:42px;height:42px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);
+  font-size:18px;font-weight:800;display:grid;place-items:center;box-shadow:0 3px 0 var(--line);flex:none}
+.back:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+
+.roundel{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none}
+.roundel b{background:var(--card);border-radius:7px;min-width:30px;text-align:center;
+  padding:1px 5px;font-size:15px;line-height:1.4;font-weight:800;max-width:60px;overflow:hidden}
+
+/* ---------- home ---------- */
+.greet{display:flex;align-items:center;gap:12px}
+.avatar{width:54px;height:54px;border-radius:50%;background:var(--sun);display:grid;place-items:center;
+  font-size:30px;border:3px solid var(--card);box-shadow:0 3px 0 color-mix(in oklab, var(--sun) 60%, black)}
+.journey{display:flex;justify-content:space-around;position:relative;margin-top:14px;padding:0 6px}
+.journey::before{content:"";position:absolute;left:14px;right:14px;top:16px;height:6px;border-radius:3px;background:var(--line)}
+.stop{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;width:72px}
+.dot{width:38px;height:38px;border-radius:50%;border:4px solid var(--line);background:var(--card);
+  display:grid;place-items:center;font-size:14px;font-weight:800}
+.stop.done .dot{border-color:var(--good);background:var(--good);color:#fff}
+.stop.now .dot{animation:pulse 1.6s ease-in-out infinite}
+.stop small{font-size:11px;font-weight:700;color:var(--muted);text-align:center}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab, var(--sun) 60%, transparent)}
+  50%{box-shadow:0 0 0 9px transparent}}
+
+.linecard{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--line);border-radius:22px;padding:14px 15px;transition:transform .08s ease}
+.linecard:active{transform:scale(.98)}
+.linecard .meta,.stationrow .meta{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.track{height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.fill{height:100%;border-radius:5px;display:block}
+.chev{color:var(--muted);font-weight:800}
+
+/* ---------- line map ---------- */
+.linemap{display:flex;flex-direction:column;position:relative;padding-left:6px}
+.linemap::before{content:"";position:absolute;left:29px;top:24px;bottom:24px;width:7px;border-radius:4px;
+  background:var(--linecolor)}
+.stationrow{display:flex;align-items:center;gap:14px;padding:11px 6px;text-align:left;position:relative;
+  border-radius:18px;transition:transform .08s ease}
+.stationrow:active{transform:scale(.98)}
+.stationrow.locked{opacity:.55}
+.mapdot{width:40px;height:40px;border-radius:50%;background:var(--card);border:4.5px solid;
+  display:grid;place-items:center;font-size:14px;font-weight:800;flex:none;z-index:1}
+.mapdot.done{background:var(--good);border-color:var(--good) !important;color:#fff}
+
+/* ---------- games ---------- */
+.gamehead{display:flex;align-items:center;gap:12px}
+.gamehead .titles{flex:1;min-width:0}
+.prompt{font-size:15px;font-weight:700;text-align:center;color:var(--muted)}
+.pairgrid{display:grid;gap:12px}
+.tile{min-height:88px;aspect-ratio:auto;border-radius:20px;background:var(--card);border:2.5px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;
+  font-size:36px;font-weight:800;box-shadow:0 4px 0 var(--line);
+  transition:transform .1s ease, border-color .15s, background .15s}
+.tile.longword{font-size:22px}
+.tile .picbody{font-size:36px;line-height:1.15}
+.tile .picbody br{line-height:1}
+.tile small{font-size:11px;color:var(--muted);font-weight:700}
+.tile.sel{border-color:var(--blue);transform:translateY(-3px)}
+.tile.matched{border-color:var(--good);background:color-mix(in oklab, var(--good) 14%, var(--card));
+  box-shadow:0 4px 0 color-mix(in oklab, var(--good) 45%, var(--line));pointer-events:none;animation:pop .35s ease}
+.tile.wrong{animation:wiggle .4s ease}
+.tile.hint{border-color:var(--sun);box-shadow:0 0 0 4px color-mix(in oklab, var(--sun) 45%, transparent)}
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes wiggle{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.blockstage{display:flex;align-items:flex-end;justify-content:center;gap:18px;min-height:260px;padding:12px 0 8px}
+.blockstage.add{min-height:220px}
+.plus{font-size:34px;font-weight:800;color:var(--muted);align-self:center}
+.tower{display:flex;flex-direction:column-reverse;gap:3px}
+.block{width:46px;height:38px;border-radius:9px;border:2.5px solid rgba(0,0,0,.28);animation:drop .3s ease backwards}
+.block .facebits{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.block .eyes{display:flex;gap:8px}
+.block .eyes i{width:6.5px;height:6.5px;border-radius:50%;background:#20283a}
+.block .smile{width:13px;height:7px;border-bottom:3px solid #20283a;border-radius:0 0 12px 12px}
+@keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.answers{display:flex;justify-content:center;gap:14px;padding-top:6px}
+.numbtn{width:74px;height:74px;border-radius:50%;font-size:28px;font-weight:800;color:#fff;
+  box-shadow:0 5px 0 rgba(0,0,0,.35);transition:transform .08s}
+.numbtn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.numbtn.wrongpick{background:var(--muted) !important;box-shadow:0 5px 0 color-mix(in oklab, var(--muted) 65%, black)}
+.roundpips{display:flex;justify-content:center;gap:8px}
+.roundpips i{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.roundpips i.on{background:var(--star)}
+
+/* ---------- stickers ---------- */
+.stickers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sticker{aspect-ratio:1;border-radius:18px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:4px;background:var(--app-bg);border:2px solid var(--line);
+  font-size:11px;font-weight:700;color:var(--muted);text-align:center;padding:4px}
+.sticker.locked{border-style:dashed;background:transparent;font-size:16px}
+.sticker.gold{border-color:var(--star);background:color-mix(in oklab, var(--star) 12%, var(--app-bg))}
+.sticker .roundel{width:36px;height:36px}
+.sticker .roundel b{font-size:12px;min-width:22px;padding:0 3px}
+
+/* ---------- parents ---------- */
+.bar{display:flex;flex-direction:column;gap:6px}
+.bar .row{font-size:13.5px;font-weight:700}
+.switchrow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)}
+.switchrow:last-child{border-bottom:none}
+.switch{position:relative;width:50px;height:29px;flex:none}
+.switch input{opacity:0;width:100%;height:100%;position:absolute;cursor:pointer;z-index:1}
+.knob{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .2s}
+.knob::after{content:"";position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked + .knob{background:var(--green)}
+.switch input:checked + .knob::after{transform:translateX(21px)}
+.safety{display:flex;flex-wrap:wrap;gap:8px}
+.safety .chip{font-size:12.5px;padding:5px 11px}
+
+.gatewrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px 0;text-align:center}
+#gatebtn{width:150px;height:150px;border-radius:50%;background:var(--card);border:3px solid var(--line);
+  font-weight:800;font-size:15px;display:grid;place-items:center;position:relative;
+  box-shadow:0 5px 0 var(--line);user-select:none;touch-action:none}
+#gatebtn.holding{animation:gatefill 3s linear forwards}
+@keyframes gatefill{from{box-shadow:0 5px 0 var(--line), inset 0 0 0 0 color-mix(in oklab, var(--green) 25%, transparent)}
+  to{box-shadow:0 5px 0 var(--line), inset 0 -150px 0 0 color-mix(in oklab, var(--green) 25%, transparent)}}
+
+/* ---------- nav ---------- */
+.nav{display:flex;border-top:1.5px solid var(--line);background:var(--card);
+  padding:8px 6px calc(10px + env(safe-area-inset-bottom))}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;
+  font-weight:800;color:var(--muted);border-radius:14px;padding:6px 0}
+.nav button .ico{font-size:21px;line-height:1;filter:grayscale(1);opacity:.6;transition:transform .15s}
+.nav button.on{color:var(--blue)}
+.nav button.on .ico{filter:none;opacity:1;transform:translateY(-2px)}
+
+/* ---------- overlays ---------- */
+.overlay{position:fixed;inset:0;background:color-mix(in oklab, var(--app-bg) 88%, transparent);
+  backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:20;padding:24px}
+.overlay.show{display:flex}
+.ovl-card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:30px 26px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;width:100%;max-width:320px;
+  animation:pop .4s ease}
+.cele-stars{font-size:44px;letter-spacing:4px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--app-bg);padding:11px 18px;border-radius:999px;font-size:13.5px;
+  font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:30;white-space:nowrap;max-width:92%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}

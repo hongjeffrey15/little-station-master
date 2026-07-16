@@ -1,0 +1,12 @@
+{
+  "name": "小站長 Little Station Master",
+  "short_name": "小站長",
+  "description": "香港小朋友嘅雙語學習遊戲 — 繁體字、English、數學。",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FBF7EE",
+  "theme_color": "#1B6FC0",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

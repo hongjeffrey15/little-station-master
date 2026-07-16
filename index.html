@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>小站長 Little Station Master</title>
+<meta name="description" content="香港小朋友嘅雙語學習遊戲 — 繁體字、English、數學。A bilingual learning game for Hong Kong kids.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#FBF7EE">
+</head>
+<body>
+<div class="app">
+  <div class="screens" id="screens">
+    <section class="screen active" id="scr-home"></section>
+    <section class="screen" id="scr-line"></section>
+    <section class="screen" id="scr-game"></section>
+    <section class="screen" id="scr-stickers"></section>
+
+    <section class="screen" id="scr-parents">
+      <h1>家長專區 · Parents</h1>
+      <div id="parent-gate">
+        <div class="gatewrap">
+          <p class="sub">呢度係大人嘅地方 — 請按住個掣 3 秒。<br>
+             Grown-ups only — press and hold for 3 seconds.</p>
+          <button id="gatebtn">按住 3 秒<br>Hold 3s 👆</button>
+        </div>
+      </div>
+      <div id="parent-panel" hidden>
+        <div style="display:flex;flex-direction:column;gap:16px" id="parent-progress"></div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="nav">
+    <button data-nav="home" class="on"><span class="ico">🏠</span>主頁</button>
+    <button data-nav="stickers"><span class="ico">⭐</span>貼紙</button>
+    <button data-nav="parents"><span class="ico">👤</span>家長</button>
+  </nav>
+
+  <div class="overlay" id="celebrate">
+    <div class="ovl-card">
+      <div class="cele-stars" id="celeStars">⭐⭐⭐</div>
+      <h1 id="celeTitle">叻叻！You did it!</h1>
+      <p class="sub" id="celeSub"></p>
+      <button class="btn red" onclick="celeReplay()">再玩 Play again</button>
+      <button class="btn ghost" onclick="celeNext()">下一站 Next station</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="rest">
+    <div class="ovl-card">
+      <div class="cele-stars">🌤️</div>
+      <h1>夠鐘休息啦！</h1>
+      <p class="sub">玩咗 15 分鐘喇 — 抖吓眼睛，郁吓身體！<br>
+         You've played for 15 minutes — time to stretch and rest your eyes!</p>
+      <button class="btn" onclick="document.getElementById('rest').classList.remove('show')">好呀 OK 👋</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
