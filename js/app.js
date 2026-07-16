@@ -17,6 +17,12 @@ const picHTML = b => b && b.startsWith('img:')
   ? `<img class="picimg" src="assets/pics/${b.slice(4)}.svg" alt="">`
   : b;
 
+/* Symbolic-question tiles — numerals and operators a pre-reading child can
+ * parse without words. Every maths question also auto-plays Cantonese audio. */
+const qNum = v => `<span class="qtile">${v}</span>`;
+const qOp  = o => `<span class="qop">${o}</span>`;
+const qAsk = () => `<span class="qtile qmystery">?</span>`;
+
 /* ---------- speech (Cantonese / English) ----------
  * Traditional Chinese audio uses the device's speech synthesis. We hunt for
  * a real Cantonese voice (zh-HK / yue); if the device only has Mandarin or
@@ -441,7 +447,7 @@ const Game = {
     this.round++;
     if (this.rounds > 1) this.pips();
     if (this.round >= this.rounds) {
-      setTimeout(() => this.finishStation(), 500);
+      setTimeout(() => this.finishStation(), 850);
     } else {
       setTimeout(() => this.nextRound(), delayNext);
     }
@@ -461,6 +467,52 @@ const Game = {
   },
 
   speakLang() { return this.st.lang === 'en' ? 'en' : 'zh'; },
+
+  /* ---- maths question: big symbols + auto Cantonese narration + replay ---- */
+  narration: '',
+  mathQ(symbolsHTML, say, sub) {
+    this.narration = say;
+    $('#gprompt').innerHTML =
+      `<div class="mathq">${symbolsHTML}</div>` +
+      `<button class="qspeak" onclick="Game.narrate()">🔊 聽問題 Hear it</button>` +
+      (sub ? `<span class="qsub">${sub}</span>` : '');
+    this.narrate();
+  },
+  narrate() { if (this.narration) speak(this.narration, 'zh'); },
+
+  /* ---- happy flow: confetti burst + button pop + a bounce of the board ---- */
+  burst(cx, cy) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const app = document.querySelector('.app');
+    if (!app) return;
+    const layer = document.createElement('div');
+    layer.className = 'burst';
+    const bits = ['⭐', '✨', '🎉', '💫', '🌟'];
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('span');
+      s.textContent = pickFrom(bits);
+      const ang = (Math.PI * 2 * i) / 14 + Math.random();
+      const dist = 55 + Math.random() * 45;
+      s.style.left = cx + 'px';
+      s.style.top = cy + 'px';
+      s.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+      s.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+      s.style.animationDelay = (Math.random() * 0.08).toFixed(2) + 's';
+      layer.appendChild(s);
+    }
+    app.appendChild(layer);
+    setTimeout(() => layer.remove(), 1100);
+  },
+  cheerBoard(btn) {
+    if (btn) {
+      btn.classList.add('correct');
+      const app = document.querySelector('.app').getBoundingClientRect();
+      const r = btn.getBoundingClientRect();
+      this.burst(r.left - app.left + r.width / 2, r.top - app.top + r.height / 2);
+    }
+    const stage = $('#gboard .blockstage') || $('#gboard .tentrain') || $('#gboard .skiptrain');
+    if (stage) { stage.classList.remove('cheer'); void stage.offsetWidth; stage.classList.add('cheer'); }
+  },
 
   /* ================= MATCH ================= */
   buildMatch() {
@@ -835,9 +887,13 @@ const Game = {
     const max = onemore ? st.max - 1 : st.max;
     this.target = randInt(min, max);
     const answer = onemore ? this.target + 1 : this.target;
-    $('#gprompt').innerHTML = onemore
-      ? `呢度有 ${this.target} 個 — 多<b>一個</b>係幾多？<br>One MORE than ${this.target} is…?`
-      : '有幾多個方塊？How many blocks?';
+    if (onemore) {
+      this.mathQ(qNum(this.target) + qOp('➕') + qNum(1) + qOp('🟰') + qAsk(),
+        `${this.target} 加 一 係幾多呀？`, `One more than ${this.target}?`);
+    } else {
+      this.mathQ('🧱' + qOp('🟰') + qAsk(),
+        '數吓，有幾多個方塊呀？', 'How many blocks?');
+    }
     $('#gboard').innerHTML = `
       <div class="blockstage"><div class="tower" id="tower"></div></div>
       <div class="answers" id="answers"></div>`;
@@ -851,7 +907,8 @@ const Game = {
     const a = randInt(1, max - 2);
     const b = randInt(1, max - a - 1) || 1;
     this.target = a + b;
-    $('#gprompt').innerHTML = `${a} 加 ${b} 係幾多？<br>What is ${a} + ${b}?`;
+    this.mathQ(qNum(a) + qOp('➕') + qNum(b) + qOp('🟰') + qAsk(),
+      `${a} 加 ${b} 係幾多呀？`, `${a} + ${b} = ?`);
     $('#gboard').innerHTML = `
       <div class="blockstage add">
         <div class="tower" id="towerA"></div>
@@ -867,7 +924,7 @@ const Game = {
   /* ================= QUICK PEEK (subitising) ================= */
   buildPeek() {
     this.target = randInt(this.st.min, this.st.max);
-    $('#gprompt').innerHTML = '快啲睇！有幾多個？<br>Quick peek — how many?';
+    this.mathQ('👀' + qOp('🟰') + qAsk(), '快啲睇！頭先有幾多個呀？', 'Quick peek — how many?');
     $('#gboard').innerHTML = `
       <div class="blockstage" id="peekstage"><div class="tower" id="tower"></div>
         <div class="peekcover" id="peekcover">🎁</div></div>
@@ -886,7 +943,8 @@ const Game = {
     const n = randInt(2, max);
     const k = this.st.allowZero ? (Math.random() < 0.4 ? n : randInt(1, n)) : randInt(1, n - 1);
     this.target = n - k;
-    $('#gprompt').innerHTML = `${n} 減 ${k} 剩返幾多？<br>${n} take away ${k} — how many left?`;
+    this.mathQ(qNum(n) + qOp('➖') + qNum(k) + qOp('🟰') + qAsk(),
+      `${n} 減 ${k}，剩返幾多呀？`, `${n} − ${k} = ?`);
     $('#gboard').innerHTML = `
       <div class="blockstage"><div class="tower" id="tower"></div></div>
       <div class="answers" id="answers"></div>`;
@@ -907,7 +965,8 @@ const Game = {
     const N = randInt(3, this.st.max);
     const a = randInt(1, N - 1);
     this.target = N - a;
-    $('#gprompt').innerHTML = `${N} 可以拆開 ${a} 同幾多？<br>${N} = ${a} + ?`;
+    this.mathQ(qNum(N) + qOp('🟰') + qNum(a) + qOp('➕') + qAsk(),
+      `${N} 可以拆開 ${a} 同埋幾多呀？`, `${N} = ${a} + ?`);
     $('#gboard').innerHTML = `
       <div class="blockstage add">
         <div class="tower" id="towerA"></div>
@@ -923,7 +982,8 @@ const Game = {
   buildDouble() {
     const a = randInt(1, this.st.max);
     this.target = a * 2;
-    $('#gprompt').innerHTML = `孖孖魔法！${a} 加 ${a} 係幾多？<br>Double ${a} is…?`;
+    this.mathQ(qNum(a) + qOp('➕') + qNum(a) + qOp('🟰') + qAsk(),
+      `孖孖魔法！${a} 加 ${a} 係幾多呀？`, `Double ${a}?`);
     $('#gboard').innerHTML = `
       <div class="blockstage add">
         <div class="tower" id="towerA"></div>
@@ -940,7 +1000,8 @@ const Game = {
   buildOddEven() {
     const n = randInt(2, this.st.max);
     this.target = n % 2 === 0 ? 'even' : 'odd';
-    $('#gprompt').innerHTML = `${n} 個方塊，兩個兩個孖住企 — 有冇一個冇得孖？<br>Is ${n} odd or even?`;
+    this.mathQ('👯' + qOp('定係') + '☝️' + qOp('❓'),
+      `${n} 個方塊，兩個兩個孖住企 — 有冇一個冇得孖呀？`, `Is ${n} odd or even?`);
     const col = BLOCK_COLORS[(n - 1) % BLOCK_COLORS.length];
     let html = '<div class="pairtower">';
     for (let r = Math.ceil(n / 2) - 1; r >= 0; r--) {
@@ -961,8 +1022,9 @@ const Game = {
       if (this.busy) return;
       if (b.dataset.v === this.target) {
         this.busy = true;
+        this.cheerBoard(b);
         toast(`啱晒！${n} 係${this.target === 'even' ? '雙' : '單'}數 ✓`);
-        this.roundWon();
+        this.roundWon(1150);
       } else {
         this.misses++;
         b.classList.add('wrong');
@@ -978,7 +1040,8 @@ const Game = {
   buildFivebit() {
     const n = randInt(6, 10);
     this.target = n - 5;
-    $('#gprompt').innerHTML = `${n} 係「5 加一啲」— 嗰啲係幾多？<br>${n} is five and a bit — how big is the bit?`;
+    this.mathQ(qNum(5) + qOp('➕') + qAsk() + qOp('🟰') + qNum(n),
+      `${n} 係 5 加一啲，嗰一啲係幾多呀？`, `5 + ? = ${n}`);
     $('#gboard').innerHTML = `
       <div class="blockstage"><div class="tower" id="tower"></div></div>
       <div class="answers" id="answers"></div>`;
@@ -999,7 +1062,8 @@ const Game = {
   buildMaketen() {
     const a = randInt(1, 9);
     this.target = 10 - a;
-    $('#gprompt').innerHTML = `${a} 加幾多先變成 10？<br>${a} and who make ten?`;
+    this.mathQ(qNum(a) + qOp('➕') + qAsk() + qOp('🟰') + qNum(10),
+      `${a} 加 幾多 先至變成 十 呀？`, `${a} + ? = 10`);
     $('#gboard').innerHTML = `
       <div class="blockstage"><div class="tower" id="tower"></div></div>
       <div class="answers" id="answers"></div>`;
@@ -1022,7 +1086,8 @@ const Game = {
   buildTeens() {
     const ones = randInt(1, 9);
     this.target = 10 + ones;
-    $('#gprompt').innerHTML = `一卡十個，加多 ${ones} 個 — 一共幾多？<br>Ten and ${ones} more is…?`;
+    this.mathQ(qNum(10) + qOp('➕') + qNum(ones) + qOp('🟰') + qAsk(),
+      `十 加 ${ones} 係幾多呀？`, `10 + ${ones} = ?`);
     $('#gboard').innerHTML = `
       <div class="blockstage add">
         <div class="tenpack" id="tenpack"></div>
@@ -1040,7 +1105,8 @@ const Game = {
   buildTens() {
     const k = randInt(2, 5);
     this.target = k * 10;
-    $('#gprompt').innerHTML = `每卡車廂有 <b>10</b> 個，${k} 卡一共幾多？<br>${k} carriages of ten — how many?`;
+    this.mathQ('🚂' + qOp('🟰') + qAsk(),
+      `${k} 卡車廂，每卡有十個，一共幾多呀？`, `${k} tens = ?`);
     $('#gboard').innerHTML = `
       <div class="tentrain" id="tentrain"><span class="sloco">🚂</span></div>
       <div class="answers" id="answers"></div>`;
@@ -1072,7 +1138,8 @@ const Game = {
     const len = 4;
     const seq = Array.from({ length: len }, (_, i) => step * (i + 1));
     this.target = step * (len + 1);
-    $('#gprompt').innerHTML = `跳住數！每次加 ${step} — 下一個係咩？<br>Counting in ${step}s — what comes next?`;
+    this.mathQ(qOp('➕' + step) + qOp('⋯') + qAsk(),
+      `跳住數，每次加 ${step}，下一個係幾多呀？`, `Skip counting in ${step}s`);
     $('#gboard').innerHTML = `
       <div class="skiptrain">
         ${seq.map((n, i) => `<span class="skipcar" style="animation-delay:${i * 0.12}s">${n}</span>`).join('')}
@@ -1135,9 +1202,10 @@ const Game = {
     if (n === answer) {
       this.busy = true;
       speak(String(answer), 'zh');
+      this.cheerBoard(btn);
       if (answer === 0) toast('冇晒喇！Zero! 0️⃣');
       else toast(`啱晒！${answer} ✓`);
-      this.roundWon();
+      this.roundWon(1150);
     } else {
       this.misses++;
       btn.classList.add('wrongpick');

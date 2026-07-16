@@ -305,6 +305,34 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .answers.oe{flex-wrap:wrap}
 .answers.oe .btn.wrong{animation:wiggle .4s ease}
 
+/* ---------- symbolic maths question ---------- */
+.mathq{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  font-weight:800;margin-bottom:4px}
+.qtile{min-width:46px;height:54px;padding:0 10px;border-radius:13px;background:var(--card);
+  border:2.5px solid var(--line);display:inline-flex;align-items:center;justify-content:center;
+  font-size:30px;font-variant-numeric:tabular-nums;box-shadow:0 3px 0 var(--line)}
+.qtile.qmystery{border-style:dashed;border-color:var(--muted);color:var(--muted)}
+.qop{font-size:24px;font-weight:800;color:var(--muted)}
+.qspeak{display:block;margin:2px auto 0;border-radius:999px;background:var(--card);
+  border:2px solid var(--line);padding:8px 16px;font-size:15px;font-weight:800;color:var(--ink);
+  box-shadow:0 3px 0 var(--line)}
+.qspeak:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.qsub{display:block;text-align:center;font-size:12px;color:var(--muted);font-weight:600;margin-top:6px}
+
+/* ---------- happy flow: correct answer ---------- */
+.numbtn.correct{background:var(--good) !important;
+  box-shadow:0 5px 0 color-mix(in oklab, var(--good) 65%, black) !important;animation:pop .45s ease}
+.answers .btn.correct{background:var(--good) !important;
+  box-shadow:0 5px 0 color-mix(in oklab, var(--good) 65%, black) !important;animation:pop .45s ease}
+@keyframes stageBounce{0%{transform:scale(1)}28%{transform:scale(1.07) translateY(-6px)}
+  60%{transform:scale(.97)}100%{transform:scale(1)}}
+.blockstage.cheer,.tentrain.cheer,.skiptrain.cheer{animation:stageBounce .6s ease}
+.burst{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:40}
+.burst span{position:absolute;font-size:20px;will-change:transform,opacity;
+  animation:fly .95s ease-out forwards}
+@keyframes fly{0%{transform:translate(0,0) scale(.4);opacity:1}
+  70%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.15);opacity:0}}
+
 /* ---------- teens / tens / skip counting ---------- */
 .block.miniblock{width:30px;height:20px;border-radius:6px}
 .block.miniblock .facebits{transform:scale(.62)}
