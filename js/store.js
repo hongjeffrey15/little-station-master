@@ -64,6 +64,9 @@ const Store = {
 
   isUnlocked(line, idx) {
     if (idx === 0) return true;
+    /* A completed station never re-locks, even if new stations are
+     * inserted before it in a content update. */
+    if (this.isDone(line.stations[idx].id)) return true;
     return this.isDone(line.stations[idx - 1].id);
   },
 

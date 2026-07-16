@@ -69,6 +69,11 @@ const LINES = [
       { id: 'm14', theme: '大數字戲法', name: '單雙站', en: 'Odd or even',     icon: '⁝',  type: 'oddeven', max: 10 },
       { id: 'm15', theme: '大數字戲法', name: '五加幾', en: 'Five and a bit',  icon: '5+', type: 'fivebit' },
       { id: 'm16', theme: '大數字戲法', name: '合十朋友', en: 'Make ten',      icon: '10', type: 'maketen' },
+
+      /* —— 十以上 beyond ten (Numberblocks S3–S4) —— */
+      { id: 'm17', theme: '十以上', name: '十加幾', en: 'Teens: ten and a bit', icon: '13', type: 'teens' },
+      { id: 'm18', theme: '十以上', name: '十十車廂', en: 'Count in tens',       icon: '30', type: 'tens' },
+      { id: 'm19', theme: '十以上', name: '跳數列車', en: 'Skip counting',       icon: '2·4', type: 'skip' },
     ],
   },
   {
@@ -283,6 +288,12 @@ const LINES = [
           { words: ['我', '去', '山頂'],   pic: '🐼⛰️', e: 'I go to the Peak.' },
           { words: ['爸爸', '飲', '茶'],   pic: '👨🍵', e: 'Daddy drinks tea.' },
           { words: ['媽媽', '食', '麵'], pic: '👩🍜', e: 'Mummy eats noodles.' },
+        ] },
+      { id: 'c33', theme: '講句子', name: '句子火車三', en: 'Sentence Train 3', icon: '🚂', type: 'sentence', lang: 'zh',
+        sentences: [
+          { words: ['我', '飲', '奶茶'],   pic: '🐼🧋', e: 'I drink milk tea.' },
+          { words: ['爺爺', '食', '月餅'], pic: '👴🥮', e: 'Grandpa eats a mooncake.' },
+          { words: ['我', '搭', '巴士'],   pic: '🐼🚌', e: 'I take the bus.' },
         ] },
 
       /* —— 天氣 weather —— */

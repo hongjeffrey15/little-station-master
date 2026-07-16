@@ -17,16 +17,51 @@ const picHTML = b => b && b.startsWith('img:')
   ? `<img class="picimg" src="assets/pics/${b.slice(4)}.svg" alt="">`
   : b;
 
-/* ---------- speech (Cantonese / English) ---------- */
+/* ---------- speech (Cantonese / English) ----------
+ * Traditional Chinese audio uses the device's speech synthesis. We hunt for
+ * a real Cantonese voice (zh-HK / yue); if the device only has Mandarin or
+ * nothing, we still set lang=zh-HK and surface the situation to parents in
+ * the settings area (with instructions to install a Cantonese voice). */
+let zhVoice = null, enVoice = null;
+function pickVoices() {
+  try {
+    const vs = speechSynthesis.getVoices();
+    zhVoice = vs.find(v => /zh[-_]HK/i.test(v.lang))
+      || vs.find(v => /yue/i.test(v.lang))
+      || null;
+    enVoice = vs.find(v => /en[-_](GB|US)/i.test(v.lang)) || null;
+  } catch (e) {}
+}
+try {
+  pickVoices();
+  speechSynthesis.onvoiceschanged = pickVoices;
+} catch (e) {}
+
 function speak(text, lang) {
   if (!Store.data.settings.audio) return;
   try {
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang === 'en' ? 'en-GB' : 'zh-HK';
+    if (lang === 'en') {
+      u.lang = 'en-GB';
+      if (enVoice) u.voice = enVoice;
+    } else {
+      u.lang = 'zh-HK';
+      if (zhVoice) u.voice = zhVoice;
+    }
     u.rate = 0.85;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
   } catch (e) {}
+}
+
+function audioStatusHTML() {
+  try {
+    if (zhVoice) return `✓ 廣東話語音：${zhVoice.name}`;
+    if (!('speechSynthesis' in window)) return '⚠️ 呢部機唔支援語音朗讀';
+    return '⚠️ 搵唔到廣東話語音 — 會用系統預設(可能係普通話)。'
+      + '<br>iPhone/iPad: 設定 → 輔助使用 → 旁白/朗讀內容 → 聲音 → 加入「廣東話」。'
+      + '<br>Android: 設定 → 系統 → 文字轉語音 → 安裝粵語聲音。';
+  } catch (e) { return ''; }
 }
 
 /* ---------- toast ---------- */
@@ -256,6 +291,7 @@ const App = {
         <div class="switchrow"><span>15 分鐘休息提示 Rest reminder</span>
           <span class="switch"><input type="checkbox" ${Store.data.settings.rest ? 'checked' : ''}
             onchange="Store.data.settings.rest=this.checked;Store.save()"><span class="knob"></span></span></div>
+        <p class="sub" style="margin-top:10px">${audioStatusHTML()}</p>
       </div>
       <div class="card">
         <h2>備份 Backup</h2>
@@ -306,7 +342,7 @@ const App = {
 const ROUNDS_BY_TYPE = {
   match: 1, memory: 1,
   count: 3, add: 3, peek: 3, takeaway: 3, bond: 3, double: 3,
-  oddeven: 3, fivebit: 3, maketen: 3,
+  oddeven: 3, fivebit: 3, maketen: 3, teens: 3, tens: 3, skip: 3,
   listen: 4,
 };
 
@@ -367,6 +403,9 @@ const Game = {
     else if (t === 'oddeven')  this.buildOddEven();
     else if (t === 'fivebit')  this.buildFivebit();
     else if (t === 'maketen')  this.buildMaketen();
+    else if (t === 'teens')    this.buildTeens();
+    else if (t === 'tens')     this.buildTens();
+    else if (t === 'skip')     this.buildSkip();
     else this.buildCount();
     if (this.rounds > 1) this.pips();
   },
@@ -952,13 +991,91 @@ const Game = {
     this.buildAnswers(this.target, 9);
   },
 
+  /* ================= TEENS: ten and a bit (S3) ================= */
+  buildTeens() {
+    const ones = randInt(1, 9);
+    this.target = 10 + ones;
+    $('#gprompt').innerHTML = `一卡十個，加多 ${ones} 個 — 一共幾多？<br>Ten and ${ones} more is…?`;
+    $('#gboard').innerHTML = `
+      <div class="blockstage add">
+        <div class="tenpack" id="tenpack"></div>
+        <div class="plus">+</div>
+        <div class="tower mini" id="towerB"></div>
+      </div>
+      <div class="answers" id="answers"></div>`;
+    this.buildTenpack($('#tenpack'), 'var(--blue)');
+    this.buildTower($('#towerB'), ones, true);
+    const opts = shuffle([this.target, this.target - 1, this.target + 1]);
+    this.renderNumButtons(opts, this.target);
+  },
+
+  /* ================= TENS: count in tens (S4) ================= */
+  buildTens() {
+    const k = randInt(2, 5);
+    this.target = k * 10;
+    $('#gprompt').innerHTML = `每卡車廂有 <b>10</b> 個，${k} 卡一共幾多？<br>${k} carriages of ten — how many?`;
+    $('#gboard').innerHTML = `
+      <div class="tentrain" id="tentrain"><span class="sloco">🚂</span></div>
+      <div class="answers" id="answers"></div>`;
+    const train = $('#tentrain');
+    for (let i = 0; i < k; i++) {
+      const c = document.createElement('div');
+      c.className = 'tenpack carriage';
+      c.style.animationDelay = (i * 0.15) + 's';
+      train.appendChild(c);
+      this.buildTenpack(c, BLOCK_COLORS[(i * 3) % BLOCK_COLORS.length]);
+    }
+    const opts = shuffle([this.target, this.target - 10, this.target + 10].filter(n => n >= 10));
+    while (opts.length < 3) opts.push(this.target + 20);
+    this.renderNumButtons(opts.slice(0, 3), this.target);
+  },
+
+  buildTenpack(el, color) {
+    for (let i = 0; i < 10; i++) {
+      const d = document.createElement('div');
+      d.className = 'cell';
+      d.style.background = color;
+      el.appendChild(d);
+    }
+  },
+
+  /* ================= SKIP COUNTING (S4) ================= */
+  buildSkip() {
+    const step = pickFrom([2, 5, 10]);
+    const len = 4;
+    const seq = Array.from({ length: len }, (_, i) => step * (i + 1));
+    this.target = step * (len + 1);
+    $('#gprompt').innerHTML = `跳住數！每次加 ${step} — 下一個係咩？<br>Counting in ${step}s — what comes next?`;
+    $('#gboard').innerHTML = `
+      <div class="skiptrain">
+        ${seq.map((n, i) => `<span class="skipcar" style="animation-delay:${i * 0.12}s">${n}</span>`).join('')}
+        <span class="skipcar mystery-car">?</span>
+      </div>
+      <div class="answers" id="answers"></div>`;
+    const opts = shuffle([this.target, this.target - step, this.target + step]);
+    this.renderNumButtons(opts, this.target);
+  },
+
+  renderNumButtons(opts, answer) {
+    const ans = $('#answers');
+    ans.innerHTML = '';
+    opts.forEach(n => {
+      const b = document.createElement('button');
+      b.className = 'numbtn';
+      b.style.background = this.line.color;
+      b.textContent = n;
+      b.onclick = () => this.guess(n, answer, b);
+      ans.appendChild(b);
+    });
+  },
+
   /* ================= shared tower / answers / guess ================= */
-  buildTower(el, n) {
+  buildTower(el, n, mini) {
     el.innerHTML = '';
     const col = BLOCK_COLORS[(n - 1) % BLOCK_COLORS.length];
     for (let i = 0; i < n; i++) {
       const d = document.createElement('div');
-      d.className = 'block';
+      d.className = mini ? 'block miniblock' : 'block';
       d.style.background = col;
       d.style.animationDelay = (i * 0.06) + 's';
       if (i === n - 1) d.innerHTML =

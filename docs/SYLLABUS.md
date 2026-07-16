@@ -19,11 +19,11 @@ Progression modelled on **Numberblocks Seasons 1–4**.
 | A2b | S1 | Subitising (recognise without counting) | m9 瞬間睇 Quick Peek |
 | A3 | S2 | Addition & subtraction within 10, part-part-whole bonds, zero | m7 加加睇 · m10 減減睇 Hop Off · m11 拆數橋 Bond Bridge · m8 加到十 · m13 零之站 Zero Hero |
 | A3b | S2–S3 | Doubles, odd & even, "five and a bit", bonds to 10 | m12 孖孖站 Twins · m14 單雙站 Odd or Even · m15 五加幾 Five & a Bit · m16 合十朋友 Make Ten |
-| A4 | S3 | Teens 11–20 as "ten and some more", ordering | v3: 十加幾 · 排隊站 |
-| A5 | S4 | Tens to 100, skip counting 2/5/10, halving, arrays | v3: 十十車廂 · 跳數列車 |
+| A4 | S3 | Teens 11–19 as "ten and some more" | m17 十加幾 Teens |
+| A5 | S4 | Tens to 50, skip counting in 2s/5s/10s | m18 十十車廂 Count in Tens · m19 跳數列車 Skip Counting |
+| A6 | S4 | Halving, arrays, ordering | v4 backlog |
 
-V2 ships A1–A3b (16 stations). A4–A5 are content updates — the engines
-already support them (see `js/data.js`).
+V3 ships A1–A5 (19 maths stations).
 
 ---
 
