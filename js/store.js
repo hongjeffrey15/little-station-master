@@ -19,7 +19,7 @@ const Store = {
       v: 1,
       stars: 0,
       badges: {},        // stationId -> { plays, days: [dateStr, ...] }
-      settings: { audio: true, rest: true },
+      settings: { audio: true, rest: true, seq: false },
       familyCode: 'HK-' + Math.random().toString(36).slice(2, 6).toUpperCase()
                         + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
       updatedAt: 0,
@@ -63,6 +63,9 @@ const Store = {
   isMastered(id) { const b = this.data.badges[id]; return !!b && b.days.length >= 2; },
 
   isUnlocked(line, idx) {
+    /* Free roam is the default — every station open for exploring.
+     * Parents can switch sequential unlocking back on in settings. */
+    if (!this.data.settings.seq) return true;
     if (idx === 0) return true;
     /* A completed station never re-locks, even if new stations are
      * inserted before it in a content update. */

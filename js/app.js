@@ -37,9 +37,23 @@ try {
   speechSynthesis.onvoiceschanged = pickVoices;
 } catch (e) {}
 
+/* iOS unlocks speech synthesis only from a user gesture — prime it silently
+ * on the first tap so later programmatic speaks (round intros, praise) work. */
+let audioPrimed = false;
+document.addEventListener('pointerdown', () => {
+  if (audioPrimed) return;
+  audioPrimed = true;
+  try {
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}, { once: true, capture: true });
+
 function speak(text, lang) {
   if (!Store.data.settings.audio) return;
   try {
+    if (!zhVoice) pickVoices();
     const u = new SpeechSynthesisUtterance(text);
     if (lang === 'en') {
       u.lang = 'en-GB';
@@ -49,18 +63,25 @@ function speak(text, lang) {
       if (zhVoice) u.voice = zhVoice;
     }
     u.rate = 0.85;
+    /* iOS drops the utterance if speak() lands in the same tick as cancel(). */
     speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+    setTimeout(() => { try { speechSynthesis.speak(u); } catch (e) {} }, 60);
   } catch (e) {}
 }
 
 function audioStatusHTML() {
   try {
-    if (zhVoice) return `✓ 廣東話語音：${zhVoice.name}`;
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const iosTip = ios
+      ? '<br>📢 iPhone/iPad：側邊嘅靜音掣(🔕)要撥返去響鈴，speech先有聲！記得較大音量。'
+      : '';
+    if (zhVoice) return `✓ 廣東話語音：${zhVoice.name}${iosTip}`;
     if (!('speechSynthesis' in window)) return '⚠️ 呢部機唔支援語音朗讀';
     return '⚠️ 搵唔到廣東話語音 — 會用系統預設(可能係普通話)。'
-      + '<br>iPhone/iPad: 設定 → 輔助使用 → 旁白/朗讀內容 → 聲音 → 加入「廣東話」。'
-      + '<br>Android: 設定 → 系統 → 文字轉語音 → 安裝粵語聲音。';
+      + '<br>iPhone/iPad: 設定 → 輔助使用 → 朗讀內容 → 聲音 → 加入「廣東話」。'
+      + '<br>Android: 設定 → 系統 → 文字轉語音 → 安裝粵語聲音。'
+      + iosTip;
   } catch (e) { return ''; }
 }
 
@@ -291,7 +312,13 @@ const App = {
         <div class="switchrow"><span>15 分鐘休息提示 Rest reminder</span>
           <span class="switch"><input type="checkbox" ${Store.data.settings.rest ? 'checked' : ''}
             onchange="Store.data.settings.rest=this.checked;Store.save()"><span class="knob"></span></span></div>
+        <div class="switchrow"><span>順序解鎖站點 Unlock stations in order</span>
+          <span class="switch"><input type="checkbox" ${Store.data.settings.seq ? 'checked' : ''}
+            onchange="Store.data.settings.seq=this.checked;Store.save()"><span class="knob"></span></span></div>
         <p class="sub" style="margin-top:10px">${audioStatusHTML()}</p>
+        <button class="btn ghost" style="margin-top:10px;width:100%"
+          onclick="speak('早晨！你好嗎？','zh');setTimeout(()=>speak('Good morning!','en'),1800)">
+          🔊 測試發音 Test the voices</button>
       </div>
       <div class="card">
         <h2>備份 Backup</h2>
