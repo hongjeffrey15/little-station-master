@@ -20,8 +20,10 @@ here because young learners with limited vocabulary need the illustration to
 Where no honest symbol exists (e.g. ✋ hand, 👃 nose, 🌊 sea) the app uses the
 device's native emoji font, which requires no attribution.
 
-## Hong Kong photo pack (planned)
+## Hong Kong icon pack
 
-HK-specific items (蝦餃, 蛋撻, 奶茶, 電車, 利是, 月餅, 燈籠…) will use
-photographs from Wikimedia Commons under their individual CC licences; each
-photo's author and licence will be listed here when added.
+HK-specific items with no equivalent in any symbol set — 蝦餃 (hargow),
+燒賣 (siumai), 蛋撻 (eggtart), 奶茶 (milktea), 電車 (tram), 利是 (laisee),
+月餅 (mooncake), 燈籠 (lantern) — are original flat SVG icons drawn for this
+project in a style matching Mulberry Symbols. They are released under this
+repository's own licence.

@@ -176,10 +176,11 @@ const LINES = [
       /* —— 飲茶 dim sum —— */
       { id: 'c12', theme: '飲茶', name: '茶樓站', en: 'Dim Sum', icon: '點', type: 'match', lang: 'zh',
         pairs: [
-          { a: '蝦餃', b: '🥟', j: 'haa1 gaau2',  e: 'shrimp dumpling' },
+          { a: '蝦餃', b: 'img:hargow', j: 'haa1 gaau2',  e: 'shrimp dumpling' },
+          { a: '燒賣', b: 'img:siumai', j: 'siu1 maai2',  e: 'siu mai' },
+          { a: '蛋撻', b: 'img:eggtart', j: 'daan6 taat1', e: 'egg tart' },
+          { a: '奶茶', b: 'img:milktea', j: 'naai5 caa4',  e: 'milk tea' },
           { a: '麵',   b: 'img:noodles', j: 'min6',        e: 'noodles' },
-          { a: '蛋撻', b: '🍮', j: 'daan6 taat1', e: 'egg tart' },
-          { a: '奶茶', b: '🧋', j: 'naai5 caa4',  e: 'milk tea' },
           { a: '粥',   b: 'img:congee', j: 'zuk1',        e: 'congee' },
         ] },
       { id: 'c13', theme: '飲茶', name: '茶樓・聽字', en: 'Dim sum — listen', icon: '👂', type: 'listen', lang: 'zh',
@@ -325,7 +326,7 @@ const LINES = [
         pairs: [
           { a: '巴士', b: 'img:bus2', j: 'baa1 si2',  e: 'bus' },
           { a: '的士', b: 'img:taxi', j: 'dik1 si2',  e: 'taxi' },
-          { a: '電車', b: '🚋', j: 'din6 ce1',  e: 'tram (ding ding)' },
+          { a: '電車', b: 'img:tram', j: 'din6 ce1',  e: 'tram (ding ding)' },
           { a: '船',   b: 'img:ferry', j: 'syun4',     e: 'boat' },
           { a: '飛機', b: 'img:plane', j: 'fei1 gei1', e: 'plane' },
         ] },
@@ -342,9 +343,9 @@ const LINES = [
       { id: 'c31', theme: '節日', name: '節日站', en: 'Festivals', icon: '🧧', type: 'match', lang: 'zh',
         pairs: [
           { a: '新年', b: 'img:fireworks', j: 'san1 nin4',    e: 'New Year' },
-          { a: '利是', b: '🧧', j: 'lai6 si6',     e: 'red packet' },
-          { a: '月餅', b: '🥮', j: 'jyut6 beng2',  e: 'mooncake' },
-          { a: '燈籠', b: '🏮', j: 'dang1 lung4',  e: 'lantern' },
+          { a: '利是', b: 'img:laisee', j: 'lai6 si6',     e: 'red packet' },
+          { a: '月餅', b: 'img:mooncake', j: 'jyut6 beng2',  e: 'mooncake' },
+          { a: '燈籠', b: 'img:lantern', j: 'dang1 lung4',  e: 'lantern' },
         ] },
       { id: 'c32', theme: '節日', name: '節日・傾偈', en: 'Festivals — talk', icon: '💬', type: 'talk', lang: 'zh',
         dialogs: [
