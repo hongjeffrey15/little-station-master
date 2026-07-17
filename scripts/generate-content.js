@@ -65,6 +65,18 @@ for (const line of LINES) {
       md += `_Listen & find: hear the word${s.prompt ? ' (MTR announcement style)' : ''}, tap the right one. Audio-only — no pictures._\n\n`;
       md += `| 字/名 | 讀音 | English |${s.pool.some(p => p.fact) ? ' 答啱後小知識 fun fact |' : ''}\n|---|---|---|${s.pool.some(p => p.fact) ? '---|' : ''}\n`;
       for (const p of s.pool) md += `| ${p.a} | ${p.j || ''} | ${p.e || ''} |${s.pool.some(x => x.fact) ? ` ${p.fact || ''} |` : ''}\n`;
+    } else if (s.type === 'hearblend') {
+      md += `_Sound Hunt (oral blending): hear the separated sounds, tap the picture. No letters shown._\n\n`;
+      md += `| word | sounds | picture |\n|---|---|---|\n`;
+      for (const p of s.pool) md += `| ${p.w} | ${p.sounds.map(x => '/' + x + '/').join(' ')} | ${pic(p.b)} |\n`;
+    } else if (s.type === 'lettersound') {
+      md += `_Letter sounds: hear the PURE sound (not the letter name) + a keyword picture, then pick the letter._\n\n`;
+      md += `| letter | sound | keyword |\n|---|---|---|\n`;
+      for (const L of s.letters) md += `| ${L.g} | /${L.snd}/ | ${L.kw} ${pic(L.b)} |\n`;
+    } else if (s.type === 'blend') {
+      md += `_Blend to Read: tap each letter for its sound, blend them together, pick the picture._\n\n`;
+      md += `| word | letters | picture |\n|---|---|---|\n`;
+      for (const W of s.words) md += `| ${W.w} | ${W.letters.join('-')} | ${pic(W.b)} |\n`;
     } else if (s.type === 'talk') {
       md += `_Talk time: pick the right conversational reply._\n\n`;
       for (const d of s.dialogs) {

@@ -220,6 +220,38 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
   border:2.5px solid var(--line);box-shadow:0 5px 0 var(--line);transition:transform .08s}
 .speakerbtn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
 
+/* ---------- phonics: letter sounds ---------- */
+.lsteach{display:flex;align-items:center;justify-content:center;gap:20px;padding:10px 0 4px}
+.bigletter{width:120px;height:120px;border-radius:26px;background:var(--card);
+  border:3px solid var(--green);font-size:76px;font-weight:800;line-height:1;color:var(--ink);
+  box-shadow:0 6px 0 color-mix(in oklab, var(--green) 45%, var(--line));font-family:Georgia,"Times New Roman",serif}
+.bigletter:active{transform:translateY(3px);box-shadow:0 3px 0 color-mix(in oklab, var(--green) 45%, var(--line))}
+.lskw{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lskw .picbody{font-size:52px}
+.lskw .picimg{width:70px;height:70px}
+.lskw small{font-size:13px;color:var(--muted);font-weight:700}
+.answers.ls{gap:16px}
+.letterbtn{width:78px;height:78px;border-radius:20px;background:var(--card);border:2.5px solid var(--line);
+  font-size:40px;font-weight:800;color:var(--ink);box-shadow:0 5px 0 var(--line);
+  font-family:Georgia,"Times New Roman",serif;transition:transform .08s}
+.letterbtn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.letterbtn.correct{background:var(--good);color:#fff;border-color:var(--good);
+  box-shadow:0 5px 0 color-mix(in oklab, var(--good) 60%, black);animation:pop .45s ease}
+.letterbtn.wrong{animation:wiggle .4s ease}
+.letterbtn.hint{border-color:var(--sun);box-shadow:0 0 0 4px color-mix(in oklab, var(--sun) 45%, transparent)}
+
+/* ---------- phonics: blend to read ---------- */
+.blendword{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 0 6px}
+.blendword.blended{animation:pop .5s ease}
+.blendtile{width:70px;height:84px;border-radius:16px;background:var(--card);border:2.5px solid var(--green);
+  font-size:46px;font-weight:800;color:var(--ink);box-shadow:0 5px 0 color-mix(in oklab, var(--green) 45%, var(--line));
+  font-family:Georgia,"Times New Roman",serif;transition:transform .12s, background .12s}
+.blendtile:active{transform:translateY(3px);box-shadow:0 2px 0 color-mix(in oklab, var(--green) 45%, var(--line))}
+.blendtile.lit{background:var(--sun);transform:translateY(-4px) scale(1.06)}
+.blendbtn{display:block;margin:2px auto 0;background:var(--green);
+  box-shadow:0 5px 0 color-mix(in oklab, var(--green) 65%, black)}
+.blendbtn:active{box-shadow:0 1px 0 color-mix(in oklab, var(--green) 65%, black)}
+
 /* ---------- talk time ---------- */
 .talkstage{display:flex;flex-direction:column;gap:20px;padding:8px 2px}
 .npcrow{display:flex;align-items:flex-start;gap:10px}

@@ -465,64 +465,71 @@ _Talk time: pick the right conversational reply._
 
 ## English Line phonics · words — 8 stations
 
-### 主題 Theme: Phonics
+### 主題 Theme: 聽聲 Big Ears
 
-**e1 · s · a · t — Letter sounds**  
-_Match: tap the word, then its picture._
+**e1 · Sound Hunt 1 — Blend by ear**  
+_Sound Hunt (oral blending): hear the separated sounds, tap the picture. No letters shown._
 
-| 字/word | 讀音 | English | 圖 picture |
-|---|---|---|---|
-| s |  | snake | 🖼 snake |
-| a |  | apple | 🖼 apple |
-| t |  | tiger | 🖼 tiger |
+| word | sounds | picture |
+|---|---|---|
+| cat | /k/ /a/ /t/ | 🐱 |
+| dog | /d/ /o/ /g/ | 🖼 dog |
+| sun | /s/ /u/ /n/ | 🖼 sun |
+| pig | /p/ /i/ /g/ | 🖼 pig |
 
-**e2 · p · i · n — Letter sounds**  
-_Match: tap the word, then its picture._
+**e2 · Sound Hunt 2 — Blend by ear**  
+_Sound Hunt (oral blending): hear the separated sounds, tap the picture. No letters shown._
 
-| 字/word | 讀音 | English | 圖 picture |
-|---|---|---|---|
-| p |  | pig | 🖼 pig |
-| i |  | insect | 🐛 |
-| n |  | nose | 👃 |
+| word | sounds | picture |
+|---|---|---|
+| bus | /b/ /u/ /s/ | 🖼 bus2 |
+| hat | /h/ /a/ /t/ | 🖼 hat |
+| pin | /p/ /i/ /n/ | 📌 |
+| bed | /b/ /e/ /d/ | 🛏️ |
 
-### 主題 Theme: Words
+### 主題 Theme: Sounds 一
 
-**e3 · First words — cat · sun · bus**  
-_Match: tap the word, then its picture._
+**e3 · Sounds s a t p — Pure letter sounds**  
+_Letter sounds: hear the PURE sound (not the letter name) + a keyword picture, then pick the letter._
 
-| 字/word | 讀音 | English | 圖 picture |
-|---|---|---|---|
-| cat |  | cat | 🖼 cat |
-| sun |  | sun | 🖼 sun |
-| bus |  | bus | 🖼 bus2 |
+| letter | sound | keyword |
+|---|---|---|
+| s | /s/ | snake 🖼 snake |
+| a | /a/ | apple 🖼 apple |
+| t | /t/ | tiger 🖼 tiger |
+| p | /p/ | pig 🖼 pig |
 
-**e4 · More words — dog · egg · hat**  
-_Match: tap the word, then its picture._
+### 主題 Theme: Sounds 二
 
-| 字/word | 讀音 | English | 圖 picture |
-|---|---|---|---|
-| dog |  | dog | 🖼 dog |
-| egg |  | egg | 🖼 egg |
-| hat |  | hat | 🖼 hat |
+**e4 · Sounds i n m d — Pure letter sounds**  
+_Letter sounds: hear the PURE sound (not the letter name) + a keyword picture, then pick the letter._
 
-**e5 · Colours — red · blue · green**  
-_Match: tap the word, then its picture._
+| letter | sound | keyword |
+|---|---|---|
+| i | /i/ | insect 🐜 |
+| n | /n/ | nose 👃 |
+| m | /m/ | mouse 🐭 |
+| d | /d/ | dog 🖼 dog |
 
-| 字/word | 讀音 | English | 圖 picture |
-|---|---|---|---|
-| red |  | red | 🔴 |
-| blue |  | blue | 🔵 |
-| green |  | green | 🟢 |
-| yellow |  | yellow | 🟡 |
+### 主題 Theme: Blend it! 拼音
 
-**e6 · Animals — fish · bird · horse**  
-_Match: tap the word, then its picture._
+**e5 · Blend to Read 1 — Sound out the word**  
+_Blend to Read: tap each letter for its sound, blend them together, pick the picture._
 
-| 字/word | 讀音 | English | 圖 picture |
-|---|---|---|---|
-| fish |  | fish | 🖼 fish |
-| bird |  | bird | 🖼 bird |
-| horse |  | horse | 🖼 horse |
+| word | letters | picture |
+|---|---|---|
+| pin | p-i-n | 📌 |
+| tin | t-i-n | 🥫 |
+| nap | n-a-p | 😴 |
+
+**e6 · Blend to Read 2 — Sound out the word**  
+_Blend to Read: tap each letter for its sound, blend them together, pick the picture._
+
+| word | letters | picture |
+|---|---|---|
+| man | m-a-n | 🧍 |
+| dad | d-a-d | 👨 |
+| tap | t-a-p | 🚰 |
 
 ### 主題 Theme: HK Bridge
 

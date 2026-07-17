@@ -376,43 +376,58 @@ const LINES = [
     color: 'var(--green)',
     colorKey: 'green',
     stations: [
-      { id: 'e1', theme: 'Phonics', name: 's · a · t', en: 'Letter sounds', icon: 's', type: 'match', lang: 'en',
-        pairs: [
-          { a: 's', b: 'img:snake', e: 'snake' },
-          { a: 'a', b: 'img:apple', e: 'apple' },
-          { a: 't', b: 'img:tiger', e: 'tiger' },
+      /* —— 聽聲 Big Ears: oral blending, NO letters yet (synthetic phonics
+       *    Phase 1). Child hears sounds "c-a-t" and taps the picture. Words
+       *    here aren't restricted to taught letters — it's pure ear training.
+       *    `sounds` are audio-clip phonemes; `w` plays the whole word. —— */
+      { id: 'e1', theme: '聽聲 Big Ears', name: 'Sound Hunt 1', en: 'Blend by ear', icon: '👂', type: 'hearblend', lang: 'en',
+        pool: [
+          { w: 'cat', sounds: ['k', 'a', 't'], b: '🐱', e: 'cat' },
+          { w: 'dog', sounds: ['d', 'o', 'g'], b: 'img:dog', e: 'dog' },
+          { w: 'sun', sounds: ['s', 'u', 'n'], b: 'img:sun', e: 'sun' },
+          { w: 'pig', sounds: ['p', 'i', 'g'], b: 'img:pig', e: 'pig' },
         ] },
-      { id: 'e2', theme: 'Phonics', name: 'p · i · n', en: 'Letter sounds', icon: 'p', type: 'match', lang: 'en',
-        pairs: [
-          { a: 'p', b: 'img:pig', e: 'pig' },
-          { a: 'i', b: '🐛', e: 'insect' },
-          { a: 'n', b: '👃', e: 'nose' },
+      { id: 'e2', theme: '聽聲 Big Ears', name: 'Sound Hunt 2', en: 'Blend by ear', icon: '👂', type: 'hearblend', lang: 'en',
+        pool: [
+          { w: 'bus', sounds: ['b', 'u', 's'], b: 'img:bus2', e: 'bus' },
+          { w: 'hat', sounds: ['h', 'a', 't'], b: 'img:hat', e: 'hat' },
+          { w: 'pin', sounds: ['p', 'i', 'n'], b: '📌', e: 'pin' },
+          { w: 'bed', sounds: ['b', 'e', 'd'], b: '🛏️', e: 'bed' },
         ] },
-      { id: 'e3', theme: 'Words', name: 'First words', en: 'cat · sun · bus', icon: 'c', type: 'match', lang: 'en',
-        pairs: [
-          { a: 'cat', b: 'img:cat', e: 'cat' },
-          { a: 'sun', b: 'img:sun', e: 'sun' },
-          { a: 'bus', b: 'img:bus2', e: 'bus' },
+
+      /* —— Letter sounds: learn the PURE sound (/s/ not "ess") + a keyword,
+       *    then a quick check "which one says /s/?". One round per letter. —— */
+      { id: 'e3', theme: 'Sounds 一', name: 'Sounds s a t p', en: 'Pure letter sounds', icon: 's', type: 'lettersound', lang: 'en',
+        letters: [
+          { g: 's', snd: 's', b: 'img:snake', kw: 'snake' },
+          { g: 'a', snd: 'a', b: 'img:apple', kw: 'apple' },
+          { g: 't', snd: 't', b: 'img:tiger', kw: 'tiger' },
+          { g: 'p', snd: 'p', b: 'img:pig',   kw: 'pig' },
         ] },
-      { id: 'e4', theme: 'Words', name: 'More words', en: 'dog · egg · hat', icon: 'd', type: 'match', lang: 'en',
-        pairs: [
-          { a: 'dog', b: 'img:dog', e: 'dog' },
-          { a: 'egg', b: 'img:egg', e: 'egg' },
-          { a: 'hat', b: 'img:hat', e: 'hat' },
+      { id: 'e4', theme: 'Sounds 二', name: 'Sounds i n m d', en: 'Pure letter sounds', icon: 'n', type: 'lettersound', lang: 'en',
+        letters: [
+          { g: 'i', snd: 'i', b: '🐜', kw: 'insect' },
+          { g: 'n', snd: 'n', b: '👃', kw: 'nose' },
+          { g: 'm', snd: 'm', b: '🐭', kw: 'mouse' },
+          { g: 'd', snd: 'd', b: 'img:dog', kw: 'dog' },
         ] },
-      { id: 'e5', theme: 'Words', name: 'Colours', en: 'red · blue · green', icon: '🎨', type: 'match', lang: 'en',
-        pairs: [
-          { a: 'red',    b: '🔴', e: 'red' },
-          { a: 'blue',   b: '🔵', e: 'blue' },
-          { a: 'green',  b: '🟢', e: 'green' },
-          { a: 'yellow', b: '🟡', e: 'yellow' },
+
+      /* —— Blend to Read: THE decoding engine. See the letters, tap each for
+       *    its sound, press "Blend it!" to hear them run together, pick the
+       *    picture. Words use only the 8 taught sounds (s a t p i n m d). —— */
+      { id: 'e5', theme: 'Blend it! 拼音', name: 'Blend to Read 1', en: 'Sound out the word', icon: '🔤', type: 'blend', lang: 'en',
+        words: [
+          { w: 'pin', letters: ['p', 'i', 'n'], b: '📌', e: 'pin' },
+          { w: 'tin', letters: ['t', 'i', 'n'], b: '🥫', e: 'tin' },
+          { w: 'nap', letters: ['n', 'a', 'p'], b: '😴', e: 'nap' },
         ] },
-      { id: 'e6', theme: 'Words', name: 'Animals', en: 'fish · bird · horse', icon: '🐟', type: 'match', lang: 'en',
-        pairs: [
-          { a: 'fish',  b: 'img:fish', e: 'fish' },
-          { a: 'bird',  b: 'img:bird', e: 'bird' },
-          { a: 'horse', b: 'img:horse', e: 'horse' },
+      { id: 'e6', theme: 'Blend it! 拼音', name: 'Blend to Read 2', en: 'Sound out the word', icon: '🔤', type: 'blend', lang: 'en',
+        words: [
+          { w: 'man', letters: ['m', 'a', 'n'], b: '🧍', e: 'man' },
+          { w: 'dad', letters: ['d', 'a', 'd'], b: '👨', e: 'dad' },
+          { w: 'tap', letters: ['t', 'a', 'p'], b: '🚰', e: 'tap' },
         ] },
+
       { id: 'e7', theme: 'HK Bridge', name: 'HK Bridge 一', en: 'Two languages, one word', icon: '⛰️', type: 'match', lang: 'en',
         pairs: [
           { a: 'mountain', sub: '山', b: 'img:mountain', e: 'mountain' },

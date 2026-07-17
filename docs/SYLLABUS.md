@@ -72,14 +72,24 @@ compound characters from components.
 
 ---
 
-## Strand C — English Line
+## Strand C — English Line (**synthetic phonics**, Build 1)
+
+Rebuilt as a proper decoding progression — pure sounds (/s/, not "ess"), oral
+blending before print, and **blend-to-read** as the core skill. Phoneme audio is
+recorded (espeak-generated) clips, since device TTS says letter *names*. Full
+rationale and the rest of the roadmap: [ENGLISH-PHONICS-PLAN.md](ENGLISH-PHONICS-PLAN.md).
 
 | Unit | Stations | Content |
 |---|---|---|
-| C1 Letter sounds | e1 s·a·t · e2 p·i·n | Jolly Phonics order (next: c k e h r m d) — letter ↔ sound-picture |
-| C2 First words | e3 · e4 | CVC words: cat sun bus dog egg hat |
-| C3 Vocabulary | e5 Colours · e6 Animals | red blue green yellow · fish bird horse |
-| C4 HK Bridge | e7 · e8 | The signature bilingual activity: one picture carries both 山 and *mountain* — each language reinforces the other |
+| C0 聽聲 Big Ears | e1 · e2 (Sound Hunt) | Oral blending, no letters: hear "c-a-t", tap the picture (cat dog sun pig bus hat pin bed) |
+| C1 Sounds s a t p | e3 (lettersound) | Pure phoneme + keyword (snake apple tiger pig), then "which letter says /s/?" |
+| C2 Sounds i n m d | e4 (lettersound) | Pure phoneme + keyword (insect nose mouse dog) |
+| C3 Blend to Read | e5 · e6 (blend) | Tap each letter for its sound → Blend it! → pick the picture: pin tin nap · man dad tap |
+| C4 HK Bridge | e7 · e8 (match) | Bilingual: one picture carries both 山 and *mountain* |
+
+**Milestone (Build 1):** the child blends s·a·t·i·p·n·m·d by ear and by sight,
+reading real CVC words rather than memorising word shapes. Next builds: sounds
+g o c k / e u r ck / h b f l, spelling (segmenting), tricky words, digraphs.
 
 ---
 

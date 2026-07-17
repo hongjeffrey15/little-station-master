@@ -43,8 +43,35 @@ try {
   speechSynthesis.onvoiceschanged = pickVoices;
 } catch (e) {}
 
-/* iOS unlocks speech synthesis only from a user gesture — prime it silently
- * on the first tap so later programmatic speaks (round intros, praise) work. */
+/* ---------- phonics audio clips (assets/audio/en, espeak-generated) ----------
+ * English phonics needs PURE phonemes (/s/, not the letter name "ess") which
+ * device TTS cannot produce — so those play from recorded clips instead. */
+const CLIP_BASE = 'assets/audio/en/';
+const clipCache = {};
+function getClip(name) {
+  let a = clipCache[name];
+  if (!a) { a = new Audio(CLIP_BASE + name + '.mp3'); a.preload = 'auto'; clipCache[name] = a; }
+  return a;
+}
+function playClip(name) {
+  return new Promise(resolve => {
+    if (!Store.data.settings.audio) return resolve();
+    let a;
+    try { a = getClip(name); a.currentTime = 0; } catch (e) { return resolve(); }
+    let done = false;
+    const finish = () => { if (done) return; done = true; a.onended = null; resolve(); };
+    a.onended = finish;
+    const p = a.play();
+    if (p && p.catch) p.catch(finish);
+    setTimeout(finish, 1500);   // safety: never hang a sequence
+  });
+}
+async function playSeq(names, gap) {
+  for (const n of names) { await playClip(n); if (gap) await new Promise(r => setTimeout(r, gap)); }
+}
+
+/* iOS unlocks speech synthesis AND audio only from a user gesture — prime both
+ * silently on the first tap so later programmatic playback works. */
 let audioPrimed = false;
 document.addEventListener('pointerdown', () => {
   if (audioPrimed) return;
@@ -53,6 +80,13 @@ document.addEventListener('pointerdown', () => {
     const u = new SpeechSynthesisUtterance(' ');
     u.volume = 0;
     speechSynthesis.speak(u);
+  } catch (e) {}
+  try {
+    const a = getClip('snd_s');
+    a.volume = 0;
+    const p = a.play();
+    const restore = () => { a.pause(); a.currentTime = 0; a.volume = 1; };
+    if (p && p.then) p.then(restore).catch(() => { a.volume = 1; });
   } catch (e) {}
 }, { once: true, capture: true });
 
@@ -397,6 +431,9 @@ const Game = {
     this.rounds = st.type === 'talk' ? st.dialogs.length
       : st.type === 'factory' ? st.builds.length
       : st.type === 'sentence' ? st.sentences.length
+      : st.type === 'lettersound' ? st.letters.length
+      : st.type === 'blend' ? st.words.length
+      : st.type === 'hearblend' ? st.pool.length
       : (ROUNDS_BY_TYPE[st.type] || 3);
     this.renderShell();
     this.nextRound();
@@ -424,6 +461,9 @@ const Game = {
     const t = this.st.type;
     if (t === 'match')    this.buildMatch();
     else if (t === 'listen')   this.buildListen();
+    else if (t === 'hearblend') this.buildHearblend();
+    else if (t === 'lettersound') this.buildLettersound();
+    else if (t === 'blend')    this.buildBlend();
     else if (t === 'talk')     this.buildTalk();
     else if (t === 'factory')  this.buildFactory();
     else if (t === 'memory')   this.buildMemory();
@@ -578,6 +618,159 @@ const Game = {
         a.classList.remove('sel', 'wrong');
         b.classList.remove('sel', 'wrong');
       }, 450);
+    }
+  },
+
+  /* ================= SOUND HUNT (oral blending) ================= */
+  buildHearblend() {
+    const pool = this.st.pool;
+    const target = pool[this.round % pool.length];
+    this.target = target;
+    const others = shuffle(pool.filter(p => p.w !== target.w)).slice(0, 2);
+    const opts = shuffle([target, ...others]);
+    $('#gprompt').innerHTML = '聽吓啲聲，砌成邊個字？<br>Listen to the sounds — tap the picture.';
+    $('#gboard').innerHTML = `
+      <div class="listenhub">
+        <button class="speakerbtn" id="replay">👂</button>
+        <span class="sub">再聽 replay</span>
+      </div>
+      <div class="pairgrid" id="hbRow" style="grid-template-columns:repeat(3,1fr)"></div>`;
+    const row = $('#hbRow');
+    opts.forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'tile pic';
+      b.dataset.w = p.w;
+      b.innerHTML = `<span class="picbody">${picHTML(p.b)}</span>`;
+      b.onclick = () => this.hearblendPick(b);
+      row.appendChild(b);
+    });
+    $('#replay').onclick = () => this.playSounds(target);
+    setTimeout(() => this.playSounds(target), 450);
+  },
+  playSounds(t) {
+    playSeq(t.sounds.map(s => 'snd_' + s), 380).then(() =>
+      setTimeout(() => playClip('w_' + t.w), 280));
+  },
+  hearblendPick(el) {
+    if (this.busy) return;
+    if (el.dataset.w === this.target.w) {
+      this.busy = true;
+      el.classList.add('matched');
+      playClip('w_' + this.target.w);
+      this.cheerBoard(el);
+      this.roundWon(1150);
+    } else {
+      this.misses++;
+      el.classList.add('wrong');
+      setTimeout(() => el.classList.remove('wrong'), 450);
+      this.playSounds(this.target);
+      if (this.misses >= 2)
+        $$('#hbRow .tile').forEach(t => { if (t.dataset.w === this.target.w) t.classList.add('hint'); });
+    }
+  },
+
+  /* ================= LETTER SOUNDS (pure phonemes) ================= */
+  buildLettersound() {
+    const L = this.st.letters[this.round];
+    this.target = L;
+    const others = shuffle(this.st.letters.filter(x => x.g !== L.g)).slice(0, 2);
+    const opts = shuffle([L, ...others]);
+    $('#gprompt').innerHTML = '撳個大階字母，聽吓佢嘅聲。<br>Tap the big letter to hear its sound.';
+    $('#gboard').innerHTML = `
+      <div class="lsteach">
+        <button class="bigletter" id="bigL">${L.g}</button>
+        <div class="lskw"><span class="picbody">${picHTML(L.b)}</span><small>${L.g} · ${L.kw}</small></div>
+      </div>
+      <p class="prompt" style="margin-top:6px">邊個字母出呢個聲？<br>Which letter makes that sound?</p>
+      <div class="answers ls" id="lsopts"></div>`;
+    $('#bigL').onclick = () => playClip('snd_' + L.snd);
+    const box = $('#lsopts');
+    opts.forEach(o => {
+      const b = document.createElement('button');
+      b.className = 'letterbtn';
+      b.textContent = o.g;
+      b.dataset.g = o.g;
+      b.onclick = () => this.lettersoundPick(b, o);
+      box.appendChild(b);
+    });
+    setTimeout(() => playClip('snd_' + L.snd), 450);
+  },
+  lettersoundPick(el, o) {
+    if (this.busy) return;
+    playClip('snd_' + o.snd);
+    if (o.g === this.target.g) {
+      this.busy = true;
+      this.cheerBoard(el);
+      this.roundWon(1100);
+    } else {
+      this.misses++;
+      el.classList.add('wrong');
+      setTimeout(() => el.classList.remove('wrong'), 450);
+      if (this.misses >= 2)
+        $$('#lsopts .letterbtn').forEach(x => { if (x.dataset.g === this.target.g) x.classList.add('hint'); });
+    }
+  },
+
+  /* ================= BLEND TO READ (decoding) ================= */
+  buildBlend() {
+    const W = this.st.words[this.round];
+    this.target = W;
+    const others = shuffle(this.st.words.filter(x => x.w !== W.w)).slice(0, 2);
+    const opts = shuffle([W, ...others]);
+    $('#gprompt').innerHTML = '撳每個字母聽聲，再撳「拼埋一齊」！<br>Tap each letter, then Blend it!';
+    $('#gboard').innerHTML = `
+      <div class="blendword" id="blendword">
+        ${W.letters.map((g, i) => `<button class="blendtile" data-i="${i}" data-snd="${g}">${g}</button>`).join('')}
+      </div>
+      <button class="btn blendbtn" id="blendBtn">🔗 拼埋一齊 Blend it!</button>
+      <div class="pairgrid" id="blendPics" style="grid-template-columns:repeat(3,1fr);margin-top:14px"></div>`;
+    $$('#blendword .blendtile').forEach(t => t.onclick = () => {
+      t.classList.add('lit');
+      playClip('snd_' + t.dataset.snd);
+      setTimeout(() => t.classList.remove('lit'), 480);
+    });
+    $('#blendBtn').onclick = () => this.doBlend(W);
+    const pics = $('#blendPics');
+    opts.forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'tile pic';
+      b.dataset.w = p.w;
+      b.innerHTML = `<span class="picbody">${picHTML(p.b)}</span>`;
+      b.onclick = () => this.blendPick(b);
+      pics.appendChild(b);
+    });
+    setTimeout(() => this.doBlend(W), 550);
+  },
+  doBlend(W) {
+    const tiles = $$('#blendword .blendtile');
+    W.letters.forEach((g, i) => {
+      setTimeout(() => {
+        if (tiles[i]) tiles[i].classList.add('lit');
+        playClip('snd_' + g);
+        setTimeout(() => { if (tiles[i]) tiles[i].classList.remove('lit'); }, 280);
+      }, i * 350);
+    });
+    setTimeout(() => {
+      const bw = $('#blendword');
+      if (bw) { bw.classList.add('blended'); setTimeout(() => bw.classList.remove('blended'), 500); }
+      playClip('w_' + W.w);
+    }, W.letters.length * 350 + 160);
+  },
+  blendPick(el) {
+    if (this.busy) return;
+    if (el.dataset.w === this.target.w) {
+      this.busy = true;
+      el.classList.add('matched');
+      playClip('w_' + this.target.w);
+      this.cheerBoard(el);
+      this.roundWon(1200);
+    } else {
+      this.misses++;
+      el.classList.add('wrong');
+      setTimeout(() => el.classList.remove('wrong'), 450);
+      this.doBlend(this.target);
+      if (this.misses >= 2)
+        $$('#blendPics .tile').forEach(t => { if (t.dataset.w === this.target.w) t.classList.add('hint'); });
     }
   },
 
