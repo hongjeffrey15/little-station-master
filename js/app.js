@@ -397,8 +397,63 @@ const App = {
   openStation(lineId, stationId) {
     this.currentLine = LINES.find(l => l.id === lineId);
     this.currentStation = this.currentLine.stations.find(s => s.id === stationId);
+    const phonics = ['hearblend', 'lettersound', 'blend'].includes(this.currentStation.type);
+    if (phonics && !Store.data.settings.sawPhonics) {
+      this.pendingStation = { lineId, stationId };
+      return this.showPhonicsIntro();
+    }
     Game.start(this.currentLine, this.currentStation);
     this.show('game');
+  },
+
+  /* First time in the phonics line, orient the grown-up + child: English is
+   * read by blending letter sounds. Shows a live p-i-n → pin demo. */
+  showPhonicsIntro() {
+    let ov = document.getElementById('phonicsIntro');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'phonicsIntro';
+      ov.className = 'overlay';
+      ov.innerHTML = `<div class="ovl-card">
+        <div class="cele-stars">🔤</div>
+        <h1>一齊拼音 · Sound it out!</h1>
+        <p class="sub">English 用「拼音」讀字：每個字母有自己嘅聲，砌埋一齊就係個字。<br>
+          In English we read by blending letter sounds together.</p>
+        <div class="introdemo" id="introdemo">
+          <span class="sotile" data-i="0">p</span>
+          <span class="sotile" data-i="1">i</span>
+          <span class="sotile" data-i="2">n</span>
+        </div>
+        <button class="btn" id="introDemoBtn">🔊 聽吓 p·i·n → pin</button>
+        <button class="btn ghost" id="introGo">開始玩 Let's go!</button>
+      </div>`;
+      document.querySelector('.app').appendChild(ov);
+    }
+    ov.classList.add('show');
+    const playDemo = () => {
+      const tiles = ov.querySelectorAll('#introdemo .sotile');
+      const sounds = ['p', 'i', 'n'];
+      sounds.forEach((s, i) => setTimeout(() => {
+        tiles.forEach(x => x.classList.remove('active'));
+        if (tiles[i]) tiles[i].classList.add('active');
+        playClip('snd_' + s);
+      }, i * 720));
+      setTimeout(() => {
+        tiles.forEach(x => { x.classList.remove('active'); x.classList.add('joined'); });
+        playClip('w_pin');
+        setTimeout(() => tiles.forEach(x => x.classList.remove('joined')), 700);
+      }, sounds.length * 720 + 150);
+    };
+    ov.querySelector('#introDemoBtn').onclick = playDemo;
+    ov.querySelector('#introGo').onclick = () => {
+      ov.classList.remove('show');
+      Store.data.settings.sawPhonics = true;
+      Store.save();
+      const s = this.pendingStation;
+      this.pendingStation = null;
+      if (s) this.openStation(s.lineId, s.stationId);
+    };
+    setTimeout(playDemo, 450);
   },
 };
 
@@ -621,22 +676,26 @@ const Game = {
     }
   },
 
-  /* ================= SOUND HUNT (oral blending) ================= */
+  /* ================= SOUND HUNT (visual blending) =================
+   * Every sound is anchored to a visible letter that lights up in sync, so
+   * you always SEE which sound is playing — then the letters join into the
+   * word, and the child picks the matching picture. */
   buildHearblend() {
     const pool = this.st.pool;
     const target = pool[this.round % pool.length];
     this.target = target;
     const others = shuffle(pool.filter(p => p.w !== target.w)).slice(0, 2);
-    const opts = shuffle([target, ...others]);
-    $('#gprompt').innerHTML = '聽吓啲聲，砌成邊個字？<br>Listen to the sounds — tap the picture.';
+    this.hbOpts = shuffle([target, ...others]);
+    $('#gprompt').innerHTML = '睇住啲字母，讀出每個音！<br>Watch each letter — sound it out!';
     $('#gboard').innerHTML = `
-      <div class="listenhub">
-        <button class="speakerbtn" id="replay">👂</button>
-        <span class="sub">再聽 replay</span>
+      <div class="soundout" id="soundout">
+        ${target.w.split('').map((g, i) => `<span class="sotile" data-i="${i}">${g}</span>`).join('')}
       </div>
-      <div class="pairgrid" id="hbRow" style="grid-template-columns:repeat(3,1fr)"></div>`;
+      <button class="btn blendbtn" id="sayBtn">🔊 再讀一次 Say it again</button>
+      <p class="prompt" id="pickq" style="margin-top:14px;visibility:hidden">撳返個公仔！Tap the picture!</p>
+      <div class="pairgrid" id="hbRow" style="grid-template-columns:repeat(3,1fr);visibility:hidden"></div>`;
     const row = $('#hbRow');
-    opts.forEach(p => {
+    this.hbOpts.forEach(p => {
       const b = document.createElement('button');
       b.className = 'tile pic';
       b.dataset.w = p.w;
@@ -644,12 +703,29 @@ const Game = {
       b.onclick = () => this.hearblendPick(b);
       row.appendChild(b);
     });
-    $('#replay').onclick = () => this.playSounds(target);
-    setTimeout(() => this.playSounds(target), 450);
+    $('#sayBtn').onclick = () => this.soundOut(target);
+    setTimeout(() => this.soundOut(target, () => {
+      const pq = $('#pickq'), hr = $('#hbRow');
+      if (pq) pq.style.visibility = 'visible';
+      if (hr) hr.style.visibility = 'visible';
+    }), 550);
   },
-  playSounds(t) {
-    playSeq(t.sounds.map(s => 'snd_' + s), 380).then(() =>
-      setTimeout(() => playClip('w_' + t.w), 280));
+  /* animate: highlight each letter as its phoneme plays, then join + say word */
+  soundOut(t, onDone) {
+    const tiles = $$('#soundout .sotile');
+    const gap = 720;
+    t.sounds.forEach((s, i) => {
+      setTimeout(() => {
+        tiles.forEach(x => x.classList.remove('active'));
+        if (tiles[i]) tiles[i].classList.add('active');
+        playClip('snd_' + s);
+      }, i * gap);
+    });
+    setTimeout(() => {
+      tiles.forEach(x => { x.classList.remove('active'); x.classList.add('joined'); });
+      playClip('w_' + t.w);
+      setTimeout(() => { tiles.forEach(x => x.classList.remove('joined')); if (onDone) onDone(); }, 760);
+    }, t.sounds.length * gap + 150);
   },
   hearblendPick(el) {
     if (this.busy) return;
@@ -663,7 +739,7 @@ const Game = {
       this.misses++;
       el.classList.add('wrong');
       setTimeout(() => el.classList.remove('wrong'), 450);
-      this.playSounds(this.target);
+      this.soundOut(this.target);
       if (this.misses >= 2)
         $$('#hbRow .tile').forEach(t => { if (t.dataset.w === this.target.w) t.classList.add('hint'); });
     }
@@ -683,7 +759,7 @@ const Game = {
       </div>
       <p class="prompt" style="margin-top:6px">邊個字母出呢個聲？<br>Which letter makes that sound?</p>
       <div class="answers ls" id="lsopts"></div>`;
-    $('#bigL').onclick = () => playClip('snd_' + L.snd);
+    $('#bigL').onclick = () => this.sayLetterSound(L);
     const box = $('#lsopts');
     opts.forEach(o => {
       const b = document.createElement('button');
@@ -693,7 +769,16 @@ const Game = {
       b.onclick = () => this.lettersoundPick(b, o);
       box.appendChild(b);
     });
-    setTimeout(() => playClip('snd_' + L.snd), 450);
+    setTimeout(() => this.sayLetterSound(L), 450);
+  },
+  /* play the pure sound, then the keyword word (natural) to anchor it: /s/ … snake */
+  sayLetterSound(L) {
+    const bl = $('#bigL');
+    if (bl) bl.classList.add('ring');
+    playClip('snd_' + L.snd).then(() => {
+      if (bl) setTimeout(() => bl.classList.remove('ring'), 200);
+      setTimeout(() => playClip('w_' + L.kw), 260);
+    });
   },
   lettersoundPick(el, o) {
     if (this.busy) return;
@@ -723,7 +808,8 @@ const Game = {
         ${W.letters.map((g, i) => `<button class="blendtile" data-i="${i}" data-snd="${g}">${g}</button>`).join('')}
       </div>
       <button class="btn blendbtn" id="blendBtn">🔗 拼埋一齊 Blend it!</button>
-      <div class="pairgrid" id="blendPics" style="grid-template-columns:repeat(3,1fr);margin-top:14px"></div>`;
+      <div class="wordreveal" id="wordreveal"></div>
+      <div class="pairgrid" id="blendPics" style="grid-template-columns:repeat(3,1fr);margin-top:8px"></div>`;
     $$('#blendword .blendtile').forEach(t => t.onclick = () => {
       t.classList.add('lit');
       playClip('snd_' + t.dataset.snd);
@@ -753,6 +839,8 @@ const Game = {
     setTimeout(() => {
       const bw = $('#blendword');
       if (bw) { bw.classList.add('blended'); setTimeout(() => bw.classList.remove('blended'), 500); }
+      const wr = $('#wordreveal');
+      if (wr) { wr.textContent = W.w; wr.classList.add('show'); }
       playClip('w_' + W.w);
     }, W.letters.length * 350 + 160);
   },

@@ -19,7 +19,7 @@ const Store = {
       v: 1,
       stars: 0,
       badges: {},        // stationId -> { plays, days: [dateStr, ...] }
-      settings: { audio: true, rest: true, seq: false },
+      settings: { audio: true, rest: true, seq: false, sawPhonics: false },
       familyCode: 'HK-' + Math.random().toString(36).slice(2, 6).toUpperCase()
                         + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
       updatedAt: 0,

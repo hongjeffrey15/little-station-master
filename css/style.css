@@ -240,7 +240,24 @@ button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
 .letterbtn.wrong{animation:wiggle .4s ease}
 .letterbtn.hint{border-color:var(--sun);box-shadow:0 0 0 4px color-mix(in oklab, var(--sun) 45%, transparent)}
 
+/* ---------- phonics: sound-out strip (Sound Hunt + intro demo) ---------- */
+.soundout,.introdemo{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0 4px}
+.introdemo{padding:6px 0 2px}
+.sotile{width:60px;height:74px;border-radius:14px;background:var(--card);border:2.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;color:var(--muted);
+  font-family:Georgia,"Times New Roman",serif;box-shadow:0 4px 0 var(--line);
+  transition:transform .18s, background .18s, color .18s, border-color .18s}
+.sotile.active{background:var(--sun);color:var(--ink);border-color:var(--sun);
+  transform:translateY(-8px) scale(1.14);box-shadow:0 8px 0 color-mix(in oklab, var(--sun) 55%, black)}
+.sotile.joined{color:var(--ink);border-color:var(--green);background:color-mix(in oklab, var(--green) 12%, var(--card))}
+.bigletter.ring{box-shadow:0 6px 0 color-mix(in oklab, var(--green) 45%, var(--line)),
+  0 0 0 6px color-mix(in oklab, var(--sun) 55%, transparent);background:color-mix(in oklab, var(--sun) 16%, var(--card))}
+
 /* ---------- phonics: blend to read ---------- */
+.wordreveal{text-align:center;font-size:34px;font-weight:800;color:var(--green);min-height:40px;
+  letter-spacing:2px;font-family:Georgia,"Times New Roman",serif;opacity:0;transform:scale(.7);
+  transition:opacity .3s, transform .3s;margin:6px 0}
+.wordreveal.show{opacity:1;transform:scale(1)}
 .blendword{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 0 6px}
 .blendword.blended{animation:pop .5s ease}
 .blendtile{width:70px;height:84px;border-radius:16px;background:var(--card);border:2.5px solid var(--green);
